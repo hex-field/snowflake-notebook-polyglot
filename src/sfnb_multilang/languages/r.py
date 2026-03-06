@@ -266,6 +266,10 @@ class RPlugin(LanguagePlugin):
             library(DBI); library(duckdb)
             con <- dbConnect(duckdb::duckdb(), dbdir=":memory:")
             tryCatch({
+                # Core extensions (httpfs) -- force HTTPS since SPCS blocks HTTP
+                dbExecute(con, "SET custom_extension_repository='https://extensions.duckdb.org'")
+                dbExecute(con, "INSTALL httpfs")
+                # Community extensions (snowflake) -- also HTTPS
                 dbExecute(con, "SET custom_extension_repository='https://community-extensions.duckdb.org'")
                 dbExecute(con, "INSTALL snowflake")
                 dbExecute(con, "LOAD snowflake")
