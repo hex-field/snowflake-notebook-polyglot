@@ -42,6 +42,11 @@ install(languages=["r", "scala"])
 install(config="config.yaml")
 ```
 
+**Performance:** A standard R-only install (tidyverse stack, no ADBC/DuckDB)
+completes in approximately 20 seconds. Adding ADBC or DuckDB add-ons will
+increase the install time as they require additional package compilation and
+downloads.
+
 ## Step 4: Use the Languages
 
 ### R

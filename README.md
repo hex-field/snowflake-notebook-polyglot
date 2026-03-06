@@ -29,6 +29,7 @@ mtcars %>% group_by(cyl) %>% summarise(mean_mpg = mean(mpg))
 ## Features
 
 - **Single command** installs any combination of R, Scala/Java, and Julia
+- **Fast** -- standard R install completes in ~20 seconds
 - **Shared infrastructure** -- micromamba and JDK are installed once, not per-language
 - **Automatic EAI setup** -- generates and optionally applies network rules
 - **Configuration-driven** -- YAML config with CLI flag overrides
