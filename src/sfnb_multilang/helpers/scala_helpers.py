@@ -515,14 +515,12 @@ def _start_spark_connect_server_early(
         import snowflake.snowpark_connect.server as spc_server
     except ImportError:
         result["errors"].append(
-            "spark_connect.enabled is true but snowpark-connect is not installed. "
-            "Re-run setup_scala_environment.sh"
+            "spark_connect.enabled is true but snowpark-connect "
+            "is not installed. Re-run setup_scala_environment.sh"
         )
         return
 
     # Monkey-patch start_jvm to skip the "JVM already running" check.
-    # Our JVM is already started with the full classpath; the server
-    # just needs to set up its gRPC servicer on top of it.
     _original_start_jvm = spc_server.start_jvm
 
     def _patched_start_jvm():
@@ -539,9 +537,48 @@ def _start_spark_connect_server_early(
     except Exception:
         session = None
 
+    # Set timezone from the Snowflake session so snowpark_connect
+    # doesn't fall back to a default with a noisy warning.
+    if session and not os.environ.get("TZ"):
+        tz_val = "UTC"
+        try:
+            rows = session.sql(
+                "SELECT CURRENT_TIMEZONE() AS tz"
+            ).collect()
+            if rows:
+                tz_val = str(rows[0]["TZ"]).strip() or "UTC"
+        except Exception:
+            pass
+        os.environ["TZ"] = tz_val
+        try:
+            time.tzset()
+        except AttributeError:
+            pass
+
+    # Disable OpenTelemetry SDK to avoid incompatible-version
+    # warnings from the container's base packages.
+    os.environ.setdefault("OTEL_SDK_DISABLED", "true")
+
     server_error = [None]
 
     def _run():
+        import io
+        import logging as _log
+        import warnings as _w
+
+        # Suppress expected thread-sharing warnings from Snowpark
+        _w.filterwarnings(
+            "ignore",
+            message=".*threads sharing the Session.*",
+        )
+        # Suppress PySpark SQL Parser / telemetry init noise
+        for name in ("py4j", "pyspark", "pyspark.sql.connect"):
+            _log.getLogger(name).setLevel(_log.ERROR)
+
+        # Redirect stderr to capture noisy PySpark/OpenTelemetry
+        # print() calls that bypass the logging framework.
+        real_stderr = sys.stderr
+        sys.stderr = io.StringIO()
         try:
             spc.start_session(
                 is_daemon=False,
@@ -550,6 +587,8 @@ def _start_spark_connect_server_early(
             )
         except Exception as e:
             server_error[0] = str(e)
+        finally:
+            sys.stderr = real_stderr
 
     thread = threading.Thread(target=_run, daemon=True)
     thread.start()

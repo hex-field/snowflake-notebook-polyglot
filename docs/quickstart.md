@@ -49,10 +49,13 @@ install(config="config.yaml")
 | R base + tidyverse | ~20s |
 | R + ADBC Snowflake driver | ~2 min (Go compilation) |
 | R + ADBC + DuckDB Snowflake extension | ~2.5 min |
+| Scala/Java + Snowpark | ~30s |
+| Scala/Java + Snowpark + Spark Connect | ~40s |
 | Subsequent runs (cached) | ~2s |
 
 ADBC is the slowest step because it compiles the Go-based Snowflake
 driver from source. DuckDB adds ~10s for extension downloads.
+Spark Connect adds ~10s for PySpark and client JAR resolution.
 
 ## Step 4: Use the Languages
 
