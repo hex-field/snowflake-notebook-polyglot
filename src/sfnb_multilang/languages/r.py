@@ -270,19 +270,18 @@ class RPlugin(LanguagePlugin):
                 description="Install DuckDB R packages",
             )
 
-        # Detect DuckDB version and extension directory from R
+        # Detect DuckDB version using Rscript (no prompt artifacts)
         r_bin = os.path.join(env_prefix, "bin", "R")
+        rscript_bin = os.path.join(env_prefix, "bin", "Rscript")
         ver_result = run_cmd(
-            [r_bin, "--vanilla", "--quiet", "-e",
-             'library(DBI);library(duckdb);'
-             'con<-dbConnect(duckdb());'
-             'cat(DBI::dbGetQuery(con,"SELECT version() as v")$v);'
-             'dbDisconnect(con)'],
+            [rscript_bin, "--vanilla", "-e",
+             'cat(packageVersion("duckdb")[[1]], sep=".")'],
             description="Get DuckDB version",
         )
-        duckdb_ver = (ver_result.stdout or "").strip().split("\n")[-1].strip()
-        if not duckdb_ver.startswith("v"):
-            duckdb_ver = "v" + duckdb_ver
+        import re
+        raw = (ver_result.stdout or "").strip()
+        ver_match = re.search(r'(\d+\.\d+\.\d+)', raw)
+        duckdb_ver = f"v{ver_match.group(1)}" if ver_match else "v1.4.4"
         logger.info("    DuckDB version: %s", duckdb_ver)
 
         ext_dir = os.path.expanduser(
