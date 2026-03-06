@@ -69,6 +69,14 @@ class RPlugin(LanguagePlugin):
                  "purpose": "Go checksum verification", "required": True},
             ])
 
+        if r_cfg.addons.get("duckdb"):
+            hosts.extend([
+                {"host": "community-extensions.duckdb.org", "port": 443,
+                 "purpose": "DuckDB community extensions", "required": True},
+                {"host": "extensions.duckdb.org", "port": 443,
+                 "purpose": "DuckDB core extensions", "required": True},
+            ])
+
         return hosts
 
     # -----------------------------------------------------------------
@@ -255,9 +263,9 @@ class RPlugin(LanguagePlugin):
             tryCatch({
                 dbExecute(con, "INSTALL snowflake FROM community")
                 dbExecute(con, "LOAD snowflake")
-                message("DuckDB Snowflake extension installed")
+                message("DuckDB Snowflake extension installed and verified")
             }, error=function(e) {
-                message(sprintf("Warning: Extension install: %s", conditionMessage(e)))
+                stop(sprintf("DuckDB Snowflake extension failed: %s", conditionMessage(e)))
             })
             dbDisconnect(con)
         """)
