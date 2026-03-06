@@ -250,7 +250,16 @@ class RPlugin(LanguagePlugin):
         logger.info("    ADBC installation complete")
 
     def _install_duckdb(self, env_prefix: str, env_name: str) -> None:
-        """Install DuckDB with Snowflake extension for R."""
+        """Install DuckDB with Snowflake extension for R.
+
+        DuckDB's built-in INSTALL command uses HTTP by default, which
+        SPCS blocks.  We download extension binaries directly via
+        Python's urllib (HTTPS) and place them in R's DuckDB extension
+        directory, then verify with LOAD.
+        """
+        import gzip
+        import urllib.request
+
         logger.info("  Installing DuckDB with Snowflake extension...")
 
         from ..shared.conda_env import get_missing_packages as _missing, _micromamba_bin
@@ -261,26 +270,59 @@ class RPlugin(LanguagePlugin):
                 description="Install DuckDB R packages",
             )
 
+        # Detect DuckDB version and extension directory from R
         r_bin = os.path.join(env_prefix, "bin", "R")
+        ver_result = run_cmd(
+            [r_bin, "--vanilla", "--quiet", "-e",
+             'library(DBI);library(duckdb);'
+             'con<-dbConnect(duckdb());'
+             'cat(DBI::dbGetQuery(con,"SELECT version() as v")$v);'
+             'dbDisconnect(con)'],
+            description="Get DuckDB version",
+        )
+        duckdb_ver = (ver_result.stdout or "").strip().split("\n")[-1].strip()
+        if not duckdb_ver.startswith("v"):
+            duckdb_ver = "v" + duckdb_ver
+        logger.info("    DuckDB version: %s", duckdb_ver)
+
+        ext_dir = os.path.expanduser(
+            f"~/.local/share/R/duckdb/extensions/{duckdb_ver}/linux_amd64"
+        )
+        os.makedirs(ext_dir, exist_ok=True)
+
+        extensions = [
+            ("httpfs", f"https://extensions.duckdb.org/{duckdb_ver}/linux_amd64/httpfs.duckdb_extension.gz"),
+            ("snowflake", f"https://community-extensions.duckdb.org/{duckdb_ver}/linux_amd64/snowflake.duckdb_extension.gz"),
+        ]
+
+        for ext_name, url in extensions:
+            dest = os.path.join(ext_dir, f"{ext_name}.duckdb_extension")
+            if os.path.isfile(dest):
+                logger.info("    %s already installed", ext_name)
+                continue
+            logger.info("    Downloading %s from %s", ext_name, url)
+            try:
+                req = urllib.request.Request(url, headers={"User-Agent": "sfnb-multilang"})
+                with urllib.request.urlopen(req, timeout=60) as resp:
+                    gz_data = resp.read()
+                with open(dest, "wb") as f:
+                    f.write(gzip.decompress(gz_data))
+                logger.info("    %s installed (%d bytes)", ext_name, os.path.getsize(dest))
+            except Exception as exc:
+                raise RuntimeError(f"Failed to download {ext_name}: {exc}") from exc
+
+        # Verify by loading in R
         r_code = textwrap.dedent("""\
             library(DBI); library(duckdb)
             con <- dbConnect(duckdb::duckdb(), dbdir=":memory:")
-            tryCatch({
-                # Core extensions (httpfs) -- force HTTPS since SPCS blocks HTTP
-                dbExecute(con, "SET custom_extension_repository='https://extensions.duckdb.org'")
-                dbExecute(con, "INSTALL httpfs")
-                # Community extensions (snowflake) -- also HTTPS
-                dbExecute(con, "SET custom_extension_repository='https://community-extensions.duckdb.org'")
-                dbExecute(con, "INSTALL snowflake")
-                dbExecute(con, "LOAD snowflake")
-                message("DuckDB Snowflake extension installed and verified")
-            }, error=function(e) {
-                stop(sprintf("DuckDB Snowflake extension failed: %s", conditionMessage(e)))
-            })
+            dbExecute(con, "SET autoinstall_known_extensions=false")
+            dbExecute(con, "LOAD httpfs")
+            dbExecute(con, "LOAD snowflake")
+            message("DuckDB Snowflake extension loaded and verified")
             dbDisconnect(con)
         """)
         run_cmd([r_bin, "--vanilla", "--quiet", "-e", r_code],
-                description="Install DuckDB Snowflake extension")
+                description="Verify DuckDB extensions")
         logger.info("    DuckDB installation complete")
 
     def _get_r_version(self, env_prefix: str) -> str:
