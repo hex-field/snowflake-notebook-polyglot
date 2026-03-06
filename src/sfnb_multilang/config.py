@@ -81,7 +81,7 @@ class JuliaConfig:
 
 @dataclass
 class NetworkRuleConfig:
-    apply_in_installer: bool = False
+    apply_in_installer: bool = True
     account: str = ""
     rule_name: str = "multilang_notebook_egress"
     integration_name: str = "multilang_notebook_eai"

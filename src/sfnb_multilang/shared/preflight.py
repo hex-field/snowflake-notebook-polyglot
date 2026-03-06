@@ -37,12 +37,17 @@ def check_disk_space(min_mb: int = MIN_DISK_SPACE_MB) -> tuple[bool, int]:
 
 
 def check_network(endpoints: List[str], timeout: int = 5) -> dict[str, bool]:
-    """Check connectivity to a list of HTTPS endpoints."""
+    """Check connectivity to a list of HTTPS endpoints.
+
+    Uses GET (not HEAD) since many CDNs/package repos reject HEAD requests.
+    Reads only a tiny amount to confirm the connection succeeds.
+    """
     results = {}
     for url in endpoints:
         try:
-            req = urllib.request.Request(url, method="HEAD")
-            urllib.request.urlopen(req, timeout=timeout)
+            req = urllib.request.Request(url, headers={"User-Agent": "sfnb-multilang"})
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                resp.read(64)
             results[url] = True
         except Exception:
             results[url] = False
