@@ -105,6 +105,10 @@ class JuliaPlugin(LanguagePlugin):
             self._build_sysimage(env_prefix, jl)
 
         version = self._get_julia_version(env_prefix)
+
+        # Write metadata for julia_helpers.py
+        self._write_metadata(env_prefix, depot, jl, version)
+
         return PluginResult(
             success=True, language="julia",
             version=version, env_prefix=env_prefix,
@@ -264,6 +268,42 @@ class JuliaPlugin(LanguagePlugin):
             timeout=1800,
         )
         logger.info("    Sysimage built at %s", sysimage_path)
+
+    def _write_metadata(
+        self, env_prefix: str, depot: str, jl_cfg: Any, version: str
+    ) -> None:
+        """Write julia_env_metadata.json for julia_helpers.py."""
+        import re
+        julia_bin = os.path.join(env_prefix, "bin", "julia")
+        m = re.search(r"(\d+)\.(\d+)", version)
+        if m:
+            project = os.path.join(
+                depot, "environments",
+                f"v{m.group(1)}.{m.group(2)}"
+            )
+        else:
+            project = depot
+
+        meta = {
+            "env_prefix": env_prefix,
+            "julia_bin": julia_bin,
+            "julia_depot_path": depot,
+            "julia_project": project,
+            "julia_version": version,
+            "juliacall_threads": "auto",
+            "juliacall_optimize": 2,
+            "sysimage_path": None,
+            "julia_packages": jl_cfg.julia_packages,
+        }
+
+        sysimage = os.path.join(depot, "sysimage.so")
+        if os.path.isfile(sysimage):
+            meta["sysimage_path"] = sysimage
+
+        meta_path = os.path.join(depot, "julia_env_metadata.json")
+        with open(meta_path, "w") as f:
+            json.dump(meta, f, indent=2)
+        logger.info("  Metadata written to %s", meta_path)
 
     def _get_julia_version(self, env_prefix: str) -> str:
         julia_bin = os.path.join(env_prefix, "bin", "julia")
