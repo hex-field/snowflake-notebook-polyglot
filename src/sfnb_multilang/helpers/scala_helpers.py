@@ -233,11 +233,16 @@ def setup_scala_environment(
     os.environ["JAVA_TOOL_OPTIONS"] = " ".join(_add_opens)
 
     # --- Pre-suppress Spark Connect / PySpark startup noise ---
-    # These must be set BEFORE _build_classpath() which does
-    # `import pyspark` (triggering OpenTelemetry init), and
-    # before _start_spark_connect_server_early() which starts
-    # the gRPC server (triggering thread-sharing warnings).
-    if metadata.get("spark_connect_enabled"):
+    # PySpark and snowpark_connect print noisy messages during
+    # import and server startup (OpenTelemetry errors, thread-
+    # sharing warnings, timezone fallback).  In Jupyter kernels
+    # sys.stdout/stderr are ZMQ-backed; libraries that cache
+    # references at import time bypass simple sys.stdout=StringIO
+    # redirects.  IPython's capture_output works at the kernel
+    # level and reliably captures all output.
+    _spc_noise = metadata.get("spark_connect_enabled")
+    _capture_ctx = None
+    if _spc_noise:
         os.environ.setdefault("OTEL_SDK_DISABLED", "true")
         import warnings as _w
         _w.filterwarnings(
@@ -248,6 +253,14 @@ def setup_scala_environment(
             "ignore",
             message=".*timezone.*",
         )
+        try:
+            from IPython.utils.capture import capture_output
+            _capture_ctx = capture_output(
+                stdout=True, stderr=True
+            )
+            _capture_ctx.__enter__()
+        except Exception:
+            _capture_ctx = None
 
     # --- Start JVM (we control the classpath) ---
     classpath = _build_classpath(
@@ -269,6 +282,11 @@ def setup_scala_environment(
             result["jvm_started"] = True
         except Exception as e:
             result["errors"].append(f"Failed to start JVM: {e}")
+            if _capture_ctx is not None:
+                try:
+                    _capture_ctx.__exit__(None, None, None)
+                except Exception:
+                    pass
             return result
     else:
         import jpype.imports  # noqa: F811
@@ -304,6 +322,13 @@ def setup_scala_environment(
 
     if spark_connect_enabled:
         _start_spark_connect_server_early(metadata, result)
+
+    # --- Release output capture (after all noisy startup) ---
+    if _capture_ctx is not None:
+        try:
+            _capture_ctx.__exit__(None, None, None)
+        except Exception:
+            pass
 
     # --- Initialize Scala interpreter ---
     if prefer_ammonite and _has_ammonite_jars(metadata):
@@ -484,16 +509,10 @@ def _build_classpath(
 
         # PySpark's bundled JARs (spark-sql, spark-catalyst, etc.)
         # are needed by the snowpark_connect server at runtime.
-        # The import is wrapped with stdout/stderr suppression
-        # because PySpark prints OpenTelemetry noise on first load.
+        # NOTE: `import pyspark` triggers noisy OpenTelemetry init;
+        # the caller wraps this in IPython capture_output.
         try:
-            import io as _io
-            _saved = (sys.stdout, sys.stderr)
-            sys.stdout = sys.stderr = _io.StringIO()
-            try:
-                import pyspark
-            finally:
-                sys.stdout, sys.stderr = _saved
+            import pyspark
             pyspark_jars_dir = os.path.join(
                 os.path.dirname(pyspark.__file__), "jars"
             )
@@ -537,7 +556,6 @@ def _start_spark_connect_server_early(
     if _port_open():
         return  # already running
 
-    import io
     import logging as _log
     import time as _time
 
@@ -571,19 +589,15 @@ def _start_spark_connect_server_early(
         except AttributeError:
             pass
 
-    # Redirect BOTH stdout AND stderr to capture all print()-based
-    # noise from snowpark_connect import and server startup.
-    _saved_out = sys.stdout
-    _saved_err = sys.stderr
-    _devnull = io.StringIO()
-    sys.stdout = _devnull
-    sys.stderr = _devnull
+    # NOTE: stdout/stderr suppression is handled by the CALLER
+    # using IPython's capture_output (works at the Jupyter kernel
+    # level; simple sys.stdout=StringIO does NOT work in notebooks
+    # because libraries cache ZMQ stream references at import time).
 
     try:
         import snowflake.snowpark_connect as spc
         import snowflake.snowpark_connect.server as spc_srv
     except ImportError:
-        sys.stdout, sys.stderr = _saved_out, _saved_err
         result["errors"].append(
             "spark_connect.enabled is true but snowpark-connect "
             "is not installed. Re-run setup_scala_environment.sh"
@@ -624,20 +638,14 @@ def _start_spark_connect_server_early(
                 f"{server_error[0]}"
             )
             spc_srv.start_jvm = _original_start_jvm
-            sys.stdout = _saved_out
-            sys.stderr = _saved_err
             return
         if _port_open():
-            sys.stdout = _saved_out
-            sys.stderr = _saved_err
             print(
                 f"  Spark Connect server listening on "
                 f"localhost:{port}"
             )
             break
     else:
-        sys.stdout = _saved_out
-        sys.stderr = _saved_err
         result["errors"].append(
             "Spark Connect server did not start within 30s"
         )
