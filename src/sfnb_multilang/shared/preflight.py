@@ -75,7 +75,7 @@ def run_preflight_checks(config: ToolkitConfig) -> PreflightResult:
 
     # Network connectivity
     logger.info("Checking network connectivity...")
-    endpoints = ["https://conda.anaconda.org/conda-forge"]
+    endpoints = ["https://conda.anaconda.org/conda-forge/noarch/repodata.json"]
     if config.r.enabled:
         endpoints.append("https://cloud.r-project.org")
     if config.scala.enabled:
