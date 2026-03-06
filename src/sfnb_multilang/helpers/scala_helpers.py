@@ -258,6 +258,24 @@ def setup_scala_environment(
         _scala_state["jvm_started"] = True
         result["jvm_started"] = True
 
+        # JVM is already running — dynamically add any new classpath entries
+        # (e.g. Spark Connect JARs added on a re-install).  We update both
+        # JPype's classloader AND the java.class.path system property so
+        # that a freshly created IMain (with usejavacp=true) sees them.
+        System = jpype.JClass("java.lang.System")
+        current_cp = str(System.getProperty("java.class.path") or "")
+        existing = set(current_cp.split(os.pathsep)) if current_cp else set()
+        new_entries = [p for p in classpath if p not in existing]
+        if new_entries:
+            for entry in new_entries:
+                jpype.addClassPath(entry)
+            new_cp = os.pathsep.join(new_entries)
+            if current_cp:
+                merged = current_cp + os.pathsep + new_cp
+            else:
+                merged = new_cp
+            System.setProperty("java.class.path", merged)
+
     # --- Start Spark Connect server (after JVM, with monkey-patch) ---
     # snowpark_connect.start_session() internally calls start_jvm() which
     # refuses to run when a JVM is already active. We need OUR JVM (with
