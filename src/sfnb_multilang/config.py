@@ -308,6 +308,7 @@ def apply_cli_overrides(cfg: ToolkitConfig, **kwargs: Any) -> ToolkitConfig:
         languages: list[str] -- enable these languages (overrides YAML)
         r_adbc: bool -- enable R ADBC addon
         r_duckdb: bool -- enable R DuckDB addon
+        scala_spark_connect: bool -- enable Scala Spark Connect
         verbose: bool -- set log level to DEBUG
         force: bool -- force reinstall
         apply_eai: bool -- try to apply EAI in installer
@@ -325,6 +326,9 @@ def apply_cli_overrides(cfg: ToolkitConfig, **kwargs: Any) -> ToolkitConfig:
     if kwargs.get("r_duckdb"):
         cfg.r.addons["duckdb"] = True
         cfg.r.enabled = True
+    if kwargs.get("scala_spark_connect"):
+        cfg.scala.spark_connect["enabled"] = True
+        cfg.scala.enabled = True
     if kwargs.get("verbose"):
         cfg.logging.level = "DEBUG"
     if kwargs.get("force"):
