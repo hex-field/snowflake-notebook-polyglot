@@ -94,17 +94,25 @@ class RPlugin(LanguagePlugin):
         if r_cfg.cran_packages:
             self._install_cran_packages(env_prefix, r_cfg.cran_packages)
 
-        # Optional add-ons
+        # Optional add-ons (these add significant install time)
         if r_cfg.addons.get("adbc"):
+            import time as _time
+            t0 = _time.monotonic()
             self._install_adbc(env_prefix, config.env_name)
+            elapsed = _time.monotonic() - t0
+            logger.info("    ADBC step took %.0fs", elapsed)
 
         if r_cfg.addons.get("duckdb"):
+            import time as _time
+            t0 = _time.monotonic()
             try:
                 self._install_duckdb(env_prefix, config.env_name)
             except Exception as exc:
                 msg = f"DuckDB addon install failed (non-fatal): {exc}"
                 logger.warning("    %s", msg)
                 warnings.append(msg)
+            elapsed = _time.monotonic() - t0
+            logger.info("    DuckDB step took %.0fs", elapsed)
 
         version = self._get_r_version(env_prefix)
 
@@ -270,18 +278,26 @@ class RPlugin(LanguagePlugin):
                 description="Install DuckDB R packages",
             )
 
-        # Detect DuckDB version using Rscript (no prompt artifacts)
+        # Detect DuckDB version from conda package metadata (avoids R prompt artifacts)
         r_bin = os.path.join(env_prefix, "bin", "R")
-        rscript_bin = os.path.join(env_prefix, "bin", "Rscript")
-        ver_result = run_cmd(
-            [rscript_bin, "--vanilla", "-e",
-             'cat(packageVersion("duckdb")[[1]], sep=".")'],
-            description="Get DuckDB version",
-        )
         import re
-        raw = (ver_result.stdout or "").strip()
-        ver_match = re.search(r'(\d+\.\d+\.\d+)', raw)
-        duckdb_ver = f"v{ver_match.group(1)}" if ver_match else "v1.4.4"
+        import json as _json
+        duckdb_ver = None
+        meta_path = os.path.join(env_prefix, "conda-meta")
+        if os.path.isdir(meta_path):
+            for fname in os.listdir(meta_path):
+                if fname.startswith("r-duckdb-") and fname.endswith(".json"):
+                    try:
+                        with open(os.path.join(meta_path, fname)) as fh:
+                            meta = _json.load(fh)
+                        ver_match = re.search(r'(\d+\.\d+\.\d+)', meta.get("version", ""))
+                        if ver_match:
+                            duckdb_ver = f"v{ver_match.group(1)}"
+                    except Exception:
+                        pass
+                    break
+        if not duckdb_ver:
+            duckdb_ver = "v1.4.4"
         logger.info("    DuckDB version: %s", duckdb_ver)
 
         ext_dir = os.path.expanduser(

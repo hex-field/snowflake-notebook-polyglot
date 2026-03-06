@@ -29,7 +29,7 @@ mtcars %>% group_by(cyl) %>% summarise(mean_mpg = mean(mpg))
 ## Features
 
 - **Single command** installs any combination of R, Scala/Java, and Julia
-- **Fast** -- standard R install completes in ~20 seconds
+- **Fast** -- R base in ~20s, R + ADBC + DuckDB in ~2.5 min, cached re-runs in ~2s
 - **Shared infrastructure** -- micromamba and JDK are installed once, not per-language
 - **Automatic EAI setup** -- generates and optionally applies network rules
 - **Configuration-driven** -- YAML config with CLI flag overrides
