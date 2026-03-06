@@ -442,6 +442,7 @@ def _build_safe_r_magics_class():
             text_only = False
             df_varname = None
             snow_inputs = []
+            o_vars = []
 
             if cell is not None:
                 parts = line.split()
@@ -515,6 +516,19 @@ def _build_safe_r_magics_class():
                     del parts[start:end]
                 if remaining_i_vars:
                     parts.extend(['-i', ','.join(remaining_i_vars)])
+
+                # Collect -o variable names so we can grid-display them
+                idx = 0
+                while idx < len(parts):
+                    if (parts[idx] in ('-o', '--output')
+                            and idx + 1 < len(parts)):
+                        for vspec in parts[idx + 1].split(','):
+                            vname = vspec.strip()
+                            if vname:
+                                o_vars.append(vname)
+                        idx += 2
+                    else:
+                        idx += 1
 
                 line = " ".join(parts)
 
@@ -590,10 +604,14 @@ def _build_safe_r_magics_class():
                 f in line for f in ('-i ', '-o ', '-w ', '-h ',
                                     '-i\t', '-o\t', '-w\t', '-h\t')
             )
+            has_plot_flags = cell is not None and any(
+                f in line for f in ('-w ', '-h ', '-w\t', '-h\t')
+            )
 
             # Determine grid mode:
             #  - "auto"  → withVisible wrapping; detect last df
             #  - "named" → capture.output wrapping; pull named var
+            #  - "io"    → -i/-o present; wrap text but let rpy2 handle vars
             #  - None    → text-only (current behaviour)
             grid_mode = None
             if cell is not None and not has_io_flags:
@@ -601,6 +619,9 @@ def _build_safe_r_magics_class():
                     grid_mode = "named"
                 elif not text_only:
                     grid_mode = "auto"
+            elif cell is not None and has_io_flags and not has_plot_flags:
+                if not text_only:
+                    grid_mode = "io"
 
             if cell is not None and not has_io_flags:
                 if grid_mode == "auto":
@@ -647,6 +668,17 @@ def _build_safe_r_magics_class():
                         'if (length(..__co__) > 0L) writeLines(..__co__)\n'
                         'rm(..__co__)'
                     )
+
+            # Wrap -i/-o cells in capture.output for clean text output.
+            # Variables stay in global scope so rpy2's -o can find them.
+            if cell is not None and grid_mode == "io":
+                cell = (
+                    '..__co__ <- capture.output({\n'
+                    + cell
+                    + '\n})\n'
+                    'if (length(..__co__) > 0L) writeLines(..__co__)\n'
+                    'rm(..__co__)'
+                )
 
             self._output_buf.clear()
             self._buffered_mode = True
@@ -712,6 +744,24 @@ def _build_safe_r_magics_class():
                         print(f"Warning: could not read R variable "
                               f"'{df_varname}': {exc}",
                               file=sys.stderr)
+
+                # --- Grid display for -o output variables ---
+                # rpy2 pushes -o variables into the notebook namespace
+                # via pandas2ri.  If the last -o var is a pandas DF,
+                # return it so Workspace renders the grid viewer.
+                if pdf is None and o_vars and not text_only:
+                    import pandas as pd
+                    ns = {}
+                    if local_ns:
+                        ns.update(local_ns)
+                    if (self.shell is not None
+                            and hasattr(self.shell, 'user_ns')):
+                        ns.update(self.shell.user_ns)
+                    for vname in reversed(o_vars):
+                        obj = ns.get(vname)
+                        if isinstance(obj, pd.DataFrame):
+                            pdf = obj
+                            break
 
                 if pdf is not None:
                     return pdf
