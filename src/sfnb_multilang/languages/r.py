@@ -99,7 +99,12 @@ class RPlugin(LanguagePlugin):
             self._install_adbc(env_prefix, config.env_name)
 
         if r_cfg.addons.get("duckdb"):
-            self._install_duckdb(env_prefix, config.env_name)
+            try:
+                self._install_duckdb(env_prefix, config.env_name)
+            except Exception as exc:
+                msg = f"DuckDB addon install failed (non-fatal): {exc}"
+                logger.warning("    %s", msg)
+                warnings.append(msg)
 
         version = self._get_r_version(env_prefix)
 
@@ -261,7 +266,8 @@ class RPlugin(LanguagePlugin):
             library(DBI); library(duckdb)
             con <- dbConnect(duckdb::duckdb(), dbdir=":memory:")
             tryCatch({
-                dbExecute(con, "INSTALL snowflake FROM community")
+                dbExecute(con, "SET custom_extension_repository='https://community-extensions.duckdb.org'")
+                dbExecute(con, "INSTALL snowflake")
                 dbExecute(con, "LOAD snowflake")
                 message("DuckDB Snowflake extension installed and verified")
             }, error=function(e) {
