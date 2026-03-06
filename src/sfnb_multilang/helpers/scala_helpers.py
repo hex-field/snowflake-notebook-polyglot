@@ -224,8 +224,6 @@ def setup_scala_environment(
         return result
 
     # --- Set JAVA_TOOL_OPTIONS (must happen before any JVM start) ---
-    # JAVA_TOOL_OPTIONS is picked up by the JVM automatically at startup,
-    # regardless of whether JPype or snowpark_connect starts it.
     _add_opens = [
         "--add-opens=java.base/java.nio=ALL-UNNAMED",
         "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED",
@@ -234,8 +232,27 @@ def setup_scala_environment(
     ]
     os.environ["JAVA_TOOL_OPTIONS"] = " ".join(_add_opens)
 
+    # --- Pre-suppress Spark Connect / PySpark startup noise ---
+    # These must be set BEFORE _build_classpath() which does
+    # `import pyspark` (triggering OpenTelemetry init), and
+    # before _start_spark_connect_server_early() which starts
+    # the gRPC server (triggering thread-sharing warnings).
+    if metadata.get("spark_connect_enabled"):
+        os.environ.setdefault("OTEL_SDK_DISABLED", "true")
+        import warnings as _w
+        _w.filterwarnings(
+            "ignore",
+            message=".*threads sharing the Session.*",
+        )
+        _w.filterwarnings(
+            "ignore",
+            message=".*timezone.*",
+        )
+
     # --- Start JVM (we control the classpath) ---
-    classpath = _build_classpath(metadata, include_ammonite=prefer_ammonite)
+    classpath = _build_classpath(
+        metadata, include_ammonite=prefer_ammonite
+    )
     jvm_options = _resolve_jvm_options(metadata)
     result["jvm_options"] = jvm_options
 
@@ -465,16 +482,26 @@ def _build_classpath(
             metadata.get("spark_connect_classpath_file", "")
         ))
 
-        # PySpark's bundled JARs (spark-sql, spark-catalyst, etc.) are needed
-        # by the snowpark_connect server at runtime. Normally spc.start_jvm()
-        # adds these, but we start the JVM ourselves and monkey-patch
-        # start_jvm, so we must include them explicitly.
+        # PySpark's bundled JARs (spark-sql, spark-catalyst, etc.)
+        # are needed by the snowpark_connect server at runtime.
+        # The import is wrapped with stdout/stderr suppression
+        # because PySpark prints OpenTelemetry noise on first load.
         try:
-            import pyspark
-            pyspark_jars_dir = os.path.join(os.path.dirname(pyspark.__file__), "jars")
+            import io as _io
+            _saved = (sys.stdout, sys.stderr)
+            sys.stdout = sys.stderr = _io.StringIO()
+            try:
+                import pyspark
+            finally:
+                sys.stdout, sys.stderr = _saved
+            pyspark_jars_dir = os.path.join(
+                os.path.dirname(pyspark.__file__), "jars"
+            )
             if os.path.isdir(pyspark_jars_dir):
                 import glob
-                cp.extend(sorted(glob.glob(os.path.join(pyspark_jars_dir, "*.jar"))))
+                cp.extend(sorted(glob.glob(
+                    os.path.join(pyspark_jars_dir, "*.jar")
+                )))
         except ImportError:
             pass
 
@@ -512,23 +539,14 @@ def _start_spark_connect_server_early(
 
     import io
     import logging as _log
-    import warnings as _w
+    import time as _time
 
-    # ---- Suppress ALL noise before any snowpark_connect imports ----
-    # OpenTelemetry init happens at import time; env var must be set
-    # before the first import touches it.
-    os.environ.setdefault("OTEL_SDK_DISABLED", "true")
-
-    # Suppress Snowpark thread-sharing warnings (global filter)
-    _w.filterwarnings(
-        "ignore", message=".*threads sharing the Session.*",
-    )
-    # Suppress PySpark SQL-parser / telemetry init log messages
+    # Suppress PySpark SQL-parser / telemetry loggers
     for _ln in ("py4j", "pyspark", "pyspark.sql.connect"):
         _log.getLogger(_ln).setLevel(_log.ERROR)
 
-    # Set timezone from Snowflake session BEFORE importing
-    # snowpark_connect so it never falls back with a warning.
+    # Set timezone from Snowflake session before snowpark_connect
+    # reads it (prevents "timezone fallback" message).
     try:
         from snowflake.snowpark.context import get_active_session
         session = get_active_session()
@@ -549,20 +567,23 @@ def _start_spark_connect_server_early(
             pass
         os.environ["TZ"] = tz_val
         try:
-            time.tzset()
+            _time.tzset()
         except AttributeError:
             pass
 
-    # Redirect stderr to swallow any remaining print()-based noise
-    # from imports and server startup.
-    _real_stderr = sys.stderr
-    sys.stderr = io.StringIO()
+    # Redirect BOTH stdout AND stderr to capture all print()-based
+    # noise from snowpark_connect import and server startup.
+    _saved_out = sys.stdout
+    _saved_err = sys.stderr
+    _devnull = io.StringIO()
+    sys.stdout = _devnull
+    sys.stderr = _devnull
 
     try:
         import snowflake.snowpark_connect as spc
         import snowflake.snowpark_connect.server as spc_srv
     except ImportError:
-        sys.stderr = _real_stderr
+        sys.stdout, sys.stderr = _saved_out, _saved_err
         result["errors"].append(
             "spark_connect.enabled is true but snowpark-connect "
             "is not installed. Re-run setup_scala_environment.sh"
@@ -596,23 +617,27 @@ def _start_spark_connect_server_early(
     thread.start()
 
     for attempt in range(30):
-        time.sleep(1)
+        _time.sleep(1)
         if server_error[0]:
             result["errors"].append(
-                f"Spark Connect server failed: {server_error[0]}"
+                f"Spark Connect server failed: "
+                f"{server_error[0]}"
             )
             spc_srv.start_jvm = _original_start_jvm
-            sys.stderr = _real_stderr
+            sys.stdout = _saved_out
+            sys.stderr = _saved_err
             return
         if _port_open():
-            sys.stderr = _real_stderr
+            sys.stdout = _saved_out
+            sys.stderr = _saved_err
             print(
                 f"  Spark Connect server listening on "
                 f"localhost:{port}"
             )
             break
     else:
-        sys.stderr = _real_stderr
+        sys.stdout = _saved_out
+        sys.stderr = _saved_err
         result["errors"].append(
             "Spark Connect server did not start within 30s"
         )
