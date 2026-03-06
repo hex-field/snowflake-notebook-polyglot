@@ -510,35 +510,31 @@ def _start_spark_connect_server_early(
     if _port_open():
         return  # already running
 
-    try:
-        import snowflake.snowpark_connect as spc
-        import snowflake.snowpark_connect.server as spc_server
-    except ImportError:
-        result["errors"].append(
-            "spark_connect.enabled is true but snowpark-connect "
-            "is not installed. Re-run setup_scala_environment.sh"
-        )
-        return
+    import io
+    import logging as _log
+    import warnings as _w
 
-    # Monkey-patch start_jvm to skip the "JVM already running" check.
-    _original_start_jvm = spc_server.start_jvm
+    # ---- Suppress ALL noise before any snowpark_connect imports ----
+    # OpenTelemetry init happens at import time; env var must be set
+    # before the first import touches it.
+    os.environ.setdefault("OTEL_SDK_DISABLED", "true")
 
-    def _patched_start_jvm():
-        import jpype
-        if jpype.isJVMStarted():
-            return
-        _original_start_jvm()
+    # Suppress Snowpark thread-sharing warnings (global filter)
+    _w.filterwarnings(
+        "ignore", message=".*threads sharing the Session.*",
+    )
+    # Suppress PySpark SQL-parser / telemetry init log messages
+    for _ln in ("py4j", "pyspark", "pyspark.sql.connect"):
+        _log.getLogger(_ln).setLevel(_log.ERROR)
 
-    spc_server.start_jvm = _patched_start_jvm
-
+    # Set timezone from Snowflake session BEFORE importing
+    # snowpark_connect so it never falls back with a warning.
     try:
         from snowflake.snowpark.context import get_active_session
         session = get_active_session()
     except Exception:
         session = None
 
-    # Set timezone from the Snowflake session so snowpark_connect
-    # doesn't fall back to a default with a noisy warning.
     if session and not os.environ.get("TZ"):
         tz_val = "UTC"
         try:
@@ -546,7 +542,9 @@ def _start_spark_connect_server_early(
                 "SELECT CURRENT_TIMEZONE() AS tz"
             ).collect()
             if rows:
-                tz_val = str(rows[0]["TZ"]).strip() or "UTC"
+                tz_val = (
+                    str(rows[0]["TZ"]).strip() or "UTC"
+                )
         except Exception:
             pass
         os.environ["TZ"] = tz_val
@@ -555,30 +553,36 @@ def _start_spark_connect_server_early(
         except AttributeError:
             pass
 
-    # Disable OpenTelemetry SDK to avoid incompatible-version
-    # warnings from the container's base packages.
-    os.environ.setdefault("OTEL_SDK_DISABLED", "true")
+    # Redirect stderr to swallow any remaining print()-based noise
+    # from imports and server startup.
+    _real_stderr = sys.stderr
+    sys.stderr = io.StringIO()
+
+    try:
+        import snowflake.snowpark_connect as spc
+        import snowflake.snowpark_connect.server as spc_srv
+    except ImportError:
+        sys.stderr = _real_stderr
+        result["errors"].append(
+            "spark_connect.enabled is true but snowpark-connect "
+            "is not installed. Re-run setup_scala_environment.sh"
+        )
+        return
+
+    # Monkey-patch start_jvm so the server reuses our JVM.
+    _original_start_jvm = spc_srv.start_jvm
+
+    def _patched_start_jvm():
+        import jpype
+        if jpype.isJVMStarted():
+            return
+        _original_start_jvm()
+
+    spc_srv.start_jvm = _patched_start_jvm
 
     server_error = [None]
 
     def _run():
-        import io
-        import logging as _log
-        import warnings as _w
-
-        # Suppress expected thread-sharing warnings from Snowpark
-        _w.filterwarnings(
-            "ignore",
-            message=".*threads sharing the Session.*",
-        )
-        # Suppress PySpark SQL Parser / telemetry init noise
-        for name in ("py4j", "pyspark", "pyspark.sql.connect"):
-            _log.getLogger(name).setLevel(_log.ERROR)
-
-        # Redirect stderr to capture noisy PySpark/OpenTelemetry
-        # print() calls that bypass the logging framework.
-        real_stderr = sys.stderr
-        sys.stderr = io.StringIO()
         try:
             spc.start_session(
                 is_daemon=False,
@@ -587,8 +591,6 @@ def _start_spark_connect_server_early(
             )
         except Exception as e:
             server_error[0] = str(e)
-        finally:
-            sys.stderr = real_stderr
 
     thread = threading.Thread(target=_run, daemon=True)
     thread.start()
@@ -599,15 +601,23 @@ def _start_spark_connect_server_early(
             result["errors"].append(
                 f"Spark Connect server failed: {server_error[0]}"
             )
-            spc_server.start_jvm = _original_start_jvm
+            spc_srv.start_jvm = _original_start_jvm
+            sys.stderr = _real_stderr
             return
         if _port_open():
-            print(f"  Spark Connect server listening on localhost:{port}")
+            sys.stderr = _real_stderr
+            print(
+                f"  Spark Connect server listening on "
+                f"localhost:{port}"
+            )
             break
     else:
-        result["errors"].append("Spark Connect server did not start within 30s")
+        sys.stderr = _real_stderr
+        result["errors"].append(
+            "Spark Connect server did not start within 30s"
+        )
 
-    spc_server.start_jvm = _original_start_jvm
+    spc_srv.start_jvm = _original_start_jvm
 
 
 def _has_ammonite_jars(metadata: Dict[str, Any]) -> bool:
