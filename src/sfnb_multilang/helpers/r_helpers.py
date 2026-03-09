@@ -1,12 +1,13 @@
 """
 R Environment Helpers for Snowflake Workspace Notebooks
 
-SYNC NOTE: This file is shared between RSnowflake and snowflakeR.
-  Canonical copies live at:
-    - RSnowflake/inst/notebooks/r_helpers.py
+CANONICAL SOURCE -- This is the single source of truth.
+  Copies are distributed to per-package notebook directories:
     - snowflakeR/inst/notebooks/r_helpers.py
-  When editing either copy, port the changes to the other and verify
-  nothing breaks in the other package's notebooks.
+    - RSnowflake/inst/notebooks/r_helpers.py
+  Edit HERE, then sync to the copies above. The sync scripts
+  (sync_snowflakeR_to_public.sh, sync_rsnowflake_to_public.sh)
+  copy this file into the public repos automatically.
 
 This module provides helper functions for:
 - R environment setup and configuration
