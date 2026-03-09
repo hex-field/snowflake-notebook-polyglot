@@ -102,7 +102,28 @@ Create `tests/unit/test_plugins/test_kotlin.py`:
 - Add a Kotlin section to `docs/quickstart.md`
 - Create a `configs/kotlin_only.yaml` preset
 
-## 7. Submit a Pull Request
+## 7. Signal Handler Conflicts (Native Runtimes)
+
+If your language runs as an in-process native runtime (like Julia via
+JuliaCall, or the JVM via JPype), be aware that native signal handlers
+can conflict.
+
+**Known conflict: JVM + Julia.** Both install SIGSEGV handlers. If
+Julia is initialised after the JVM and a Snowpark Scala session is
+then created (SSL handshake), the conflicting handlers cause a kernel
+crash (SIGSEGV). The mitigation is to enforce cell ordering: Snowpark
+Scala bootstrap must complete before Julia is initialised.
+
+When adding a new native runtime:
+
+- Test it alongside every existing native runtime (JVM, Julia, R/C)
+- Watch for SIGSEGV, SIGFPE, or SIGBUS crashes during network I/O,
+  GC, or JIT compilation
+- Add guards in your `setup_*_environment()` helper that detect
+  conflicting runtimes and warn the user about required ordering
+- Document any ordering constraints in `docs/quickstart.md`
+
+## 8. Submit a Pull Request
 
 Checklist:
 
@@ -113,3 +134,4 @@ Checklist:
 - [ ] Unit tests pass
 - [ ] Documentation updated
 - [ ] No hardcoded personal identifiers
+- [ ] Tested alongside all other enabled runtimes for signal conflicts

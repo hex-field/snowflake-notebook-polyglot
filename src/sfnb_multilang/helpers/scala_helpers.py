@@ -2920,6 +2920,17 @@ def bootstrap_snowpark_scala(session) -> Tuple[bool, str]:
     Returns:
         (success, message)
     """
+    # Guard: Julia installs native signal handlers that conflict with
+    # JVM SSL/network operations, causing an unrecoverable SIGSEGV.
+    if "juliacall" in sys.modules:
+        return False, (
+            "FATAL: Julia runtime is already initialised. Creating a "
+            "Snowpark Scala session will crash the kernel (SIGSEGV) due "
+            "to JVM/Julia signal handler conflict.\n"
+            "Fix: call bootstrap_snowpark_scala(session) BEFORE "
+            "setup_julia_environment(). Restart kernel and reorder cells."
+        )
+
     creds = inject_session_credentials(session)
     if not creds.get("SNOWFLAKE_ACCOUNT"):
         return False, "Failed to extract account from session"

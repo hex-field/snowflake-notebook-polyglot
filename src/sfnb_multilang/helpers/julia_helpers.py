@@ -149,6 +149,27 @@ def setup_julia_environment(
 
     t_start = time.time()
 
+    # Warn if JVM is already running -- Snowpark Scala session creation
+    # after Julia init causes SIGSEGV due to signal handler conflict.
+    try:
+        import jpype
+        if jpype.isJVMStarted():
+            import warnings
+            warnings.warn(
+                "JVM is already running. If you need "
+                "bootstrap_snowpark_scala(), call it BEFORE "
+                "setup_julia_environment() to avoid a kernel crash "
+                "(SIGSEGV from JVM/Julia signal handler conflict). "
+                "Restart kernel and reorder cells if needed.",
+                stacklevel=2,
+            )
+            result["warnings"].append(
+                "JVM running before Julia init -- Snowpark bootstrap "
+                "must happen before this call to avoid SIGSEGV."
+            )
+    except ImportError:
+        pass
+
     # -------------------------------------------------------------------------
     # Step 1: Load metadata
     # -------------------------------------------------------------------------
@@ -304,7 +325,10 @@ def _configure_environment(metadata: Dict):
 
     os.environ["PYTHON_JULIACALL_THREADS"] = str(threads)
     os.environ["PYTHON_JULIACALL_OPTIMIZE"] = str(optimize)
-    os.environ["PYTHON_JULIACALL_HANDLE_SIGNALS"] = "yes"
+    # "no" reduces signal handler conflicts with the JVM (SIGSEGV).
+    # Trade-off: Julia loses its own stack overflow protection.
+    # Revert to "yes" if Julia-only notebooks show instability.
+    os.environ["PYTHON_JULIACALL_HANDLE_SIGNALS"] = "no"
     os.environ["PYTHON_JULIACALL_STARTUP_FILE"] = "no"
 
     # Bypass the Julia package server — SPCS DNS cannot resolve
