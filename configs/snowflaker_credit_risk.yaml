@@ -22,7 +22,10 @@ languages:
     conda_packages:
       - r-tidyverse
       - r-dbplyr
+      - r-dbi>=1.2.0
       - r-httr2
+      - r-jsonlite
+      - r-nanoarrow
       - r-lazyeval
       - r-reticulate>=1.25
       - r-tidymodels
