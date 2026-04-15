@@ -476,8 +476,13 @@ The `auth_secret` is set in the YAML but `setup_notebook()` could
 not read the credentials. Common causes:
 
 - **Secret not attached to notebook service:** The secret must be
-  selected in the notebook service creation dialog (Snowsight) in
-  addition to being in the EAI
+  selected when creating or editing the Workspace notebook service in
+  Snowsight, in addition to SQL on the EAI. How you attach secrets
+  depends on environment: **Snowhouse** — enter fully qualified secret
+  names as `DB.SCHEMA.SECRET_NAME`, comma-separated for multiple;
+  **QA6** — use the multi-select secrets dropdown in the create-service
+  dialog. If this step is skipped, the Snowpark Secrets API and the
+  `/secrets/...` mount both fail, and mirror URLs stay unauthenticated.
 - **Secret not in EAI:** The secret must be listed in
   `ALLOWED_AUTHENTICATION_SECRETS` on the EAI
 - **Wrong secret path:** The `auth_secret` value must be fully
