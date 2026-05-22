@@ -1,6 +1,6 @@
-# snowflake-notebook-multilang
+# snowflake-notebook-multilang <img src="docs/logo.png" align="right" height="139" />
 
-<img src="docs/logo.png" align="right" height="139" />
+> **Author:** [Simon Field](https://www.linkedin.com/in/fieldy6961) — SnowCAT
 
 > **Community Project -- Not Officially Supported**
 > This is a community-developed project from
