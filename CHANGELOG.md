@@ -2,6 +2,14 @@
 
 All notable changes to the `sfnb-multilang` toolkit are documented here.
 
+## [Unreleased]
+
+### Fixed
+
+- **`%%R` `-i` / `-o` comma lists:** `-o p, mtcars` (space after comma) no longer
+  leaves an orphan token that rpy2 injects into the R cell (`mtcarslibrary(...)`).
+  `SafeRMagics` normalizes IO lists to `-o p,mtcars` before parsing.
+
 ## [0.1.3] - 2026-04-28
 
 ### Fixed
