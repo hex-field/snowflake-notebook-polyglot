@@ -1,0 +1,17 @@
+# Local CRE profiles (may contain account-specific registry hosts)
+configs/cre_profile.yaml
+configs/sfnb_ml.yaml
+configs/*_local.yaml
+
+# Rendered build artifacts (regenerate via create_cre.sh)
+docker/generated/cre_profile.env
+docker/generated/cre_register.sql
+docker/generated/cre_runtime.yaml
+docker/generated/cre_extra_install.sh
+.DS_Store
+
+# Python
+__pycache__/
+*.egg-info/
+.venv/
+dist/
