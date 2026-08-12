@@ -5,7 +5,7 @@ as an example).
 
 ## 1. Create the Plugin Module
 
-Create `src/sfnb_multilang/languages/kotlin.py`:
+Create `src/sfnb_polyglot/languages/kotlin.py`:
 
 ```python
 from ..config import ToolkitConfig
@@ -52,7 +52,7 @@ class KotlinPlugin(LanguagePlugin):
 
 ## 2. Register the Plugin
 
-In `src/sfnb_multilang/languages/__init__.py`, add Kotlin to the registry:
+In `src/sfnb_polyglot/languages/__init__.py`, add Kotlin to the registry:
 
 ```python
 from .kotlin import KotlinPlugin
@@ -84,7 +84,7 @@ languages:
 
 ## 4. Create the Helper Module
 
-Create `src/sfnb_multilang/helpers/kotlin_helpers.py` with the notebook
+Create `src/sfnb_polyglot/helpers/kotlin_helpers.py` with the notebook
 magic (`%%kotlin`) and setup function.
 
 ## 5. Write Tests

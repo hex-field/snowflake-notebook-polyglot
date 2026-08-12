@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build sfnb-multilang CRE image inside Snowflake (SPCS Image Builder, preview).
+# Build snowflake-notebook-polyglot CRE image inside Snowflake (SPCS Image Builder, preview).
 # All account-specific values come from environment variables — set before running.
 #
 # Required:
@@ -31,9 +31,9 @@ export SNOWFLAKE_CLI_FEATURES_ENABLE_SPCS_BUILD_IMAGE="${SNOWFLAKE_CLI_FEATURES_
 
 SNOW="${SNOW_CLI:-snow}"
 ROLE="${SNOW_ROLE:-SYSADMIN}"
-IMAGE_NAME="${SFNB_IMAGE_NAME:-sfnb-multilang-r}"
+IMAGE_NAME="${SFNB_IMAGE_NAME:-sfnb-polyglot-r}"
 IMAGE_TAG="${SFNB_IMAGE_TAG:-v1}"
-CRE_NAME="${CRE_NAME:-sfnb_multilang_r}"
+CRE_NAME="${CRE_NAME:-sfnb_polyglot_r}"
 BUILD_CTX="${REPO_ROOT}/docker/build-ctx"
 
 echo "==> Preparing flat build context"

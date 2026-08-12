@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from sfnb_multilang.config import ToolkitConfig
-from sfnb_multilang.exceptions import PackageConflictError
-from sfnb_multilang.languages.base import (
+from sfnb_polyglot.config import ToolkitConfig
+from sfnb_polyglot.exceptions import PackageConflictError
+from sfnb_polyglot.languages.base import (
     PackageRequest,
     parse_package,
     resolve_version_conflict,
@@ -120,7 +120,7 @@ class TestInstallerPackageCollection:
     """Test that the Installer correctly collects and deduplicates packages."""
 
     def test_r_only_packages(self):
-        from sfnb_multilang.installer import Installer
+        from sfnb_polyglot.installer import Installer
 
         cfg = ToolkitConfig()
         cfg.r.enabled = True
@@ -132,7 +132,7 @@ class TestInstallerPackageCollection:
         assert "r-tidyverse" in base_names
 
     def test_scala_only_packages(self):
-        from sfnb_multilang.installer import Installer
+        from sfnb_polyglot.installer import Installer
 
         cfg = ToolkitConfig()
         cfg.scala.enabled = True
@@ -147,7 +147,7 @@ class TestInstallerPackageCollection:
         assert "JPype1" in pip_names
 
     def test_julia_only_packages(self):
-        from sfnb_multilang.installer import Installer
+        from sfnb_polyglot.installer import Installer
 
         cfg = ToolkitConfig()
         cfg.julia.enabled = True
@@ -163,7 +163,7 @@ class TestInstallerPackageCollection:
 
     def test_all_languages_no_conflict(self):
         """All three languages enabled should produce no conflicts."""
-        from sfnb_multilang.installer import Installer
+        from sfnb_polyglot.installer import Installer
 
         cfg = ToolkitConfig()
         cfg.r.enabled = True

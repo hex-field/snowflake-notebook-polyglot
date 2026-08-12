@@ -1,5 +1,5 @@
 # =============================================================================
-# Snowflake Notebook Multi-Language Toolkit -- Default Configuration
+# Snowflake Notebook Polyglot Toolkit -- Default Configuration
 # =============================================================================
 # All languages enabled with sensible defaults.
 #
@@ -85,8 +85,8 @@ languages:
 network_rule:
   apply_in_installer: true
   account: ""
-  rule_name: multilang_notebook_egress
-  integration_name: multilang_notebook_eai
+  rule_name: polyglot_notebook_egress
+  integration_name: polyglot_notebook_eai
   grant_to_role: ""
   sql_export_path: ./eai_setup.sql
 

@@ -14,7 +14,7 @@ from ..shared.download import retry
 from ..shared.subprocess_utils import run_cmd
 from .base import LanguagePlugin, PluginResult
 
-logger = logging.getLogger("sfnb_multilang.languages.r")
+logger = logging.getLogger("sfnb_polyglot.languages.r")
 
 
 class RPlugin(LanguagePlugin):
@@ -426,7 +426,7 @@ class RPlugin(LanguagePlugin):
                 continue
             logger.info("    Downloading %s from %s", ext_name, url)
             try:
-                req = urllib.request.Request(url, headers={"User-Agent": "sfnb-multilang"})
+                req = urllib.request.Request(url, headers={"User-Agent": "snowflake-notebook-polyglot"})
                 with urllib.request.urlopen(req, timeout=60) as resp:
                     gz_data = resp.read()
                 with open(dest, "wb") as f:

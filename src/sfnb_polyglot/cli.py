@@ -1,4 +1,4 @@
-"""Command-line interface for the multi-language toolkit."""
+"""Command-line interface for the polyglot toolkit."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from .logging_config import setup_logging
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="sfnb-setup",
-        description="Multi-language setup for Snowflake Workspace Notebooks",
+        description="Polyglot setup for Snowflake Workspace Notebooks",
     )
     sub = parser.add_subparsers(dest="command", help="Available commands")
 

@@ -65,9 +65,9 @@ If any attached EAI has a network rule of TYPE=IPV4 with `0.0.0.0/0` or
 TYPE=HOST_PORT with `0.0.0.0:port`, it is treated as "open" (allows all
 egress) and no domain modifications are needed.
 
-## Automatic Setup (sfnb-multilang API)
+## Automatic Setup (snowflake-notebook-polyglot API)
 
-The `sfnb-multilang` installer includes network rule setup as **Phase 0**,
+The `snowflake-notebook-polyglot` installer includes network rule setup as **Phase 0**,
 before any downloads. It attempts to create the network rule and EAI via
 the active Snowpark session.
 
@@ -76,7 +76,7 @@ the active Snowpark session.
 The EAI is created automatically. You just need to enable it in Snowsight
 after the SQL executes:
 
-**Connected > Edit > External Access > toggle on multilang_notebook_eai > Save**
+**Connected > Edit > External Access > toggle on polyglot_notebook_eai > Save**
 
 Once created and attached, the same EAI can be reused across multiple
 Workspace Notebooks -- it is a one-time setup per service.
@@ -95,7 +95,7 @@ Share the `.sql` file with your administrator. They can run it with
 ## Manual Generation
 
 ```python
-from sfnb_multilang import generate_eai_sql
+from sfnb_polyglot import generate_eai_sql
 
 sql = generate_eai_sql(languages=["r", "scala"], account="myaccount")
 print(sql)
@@ -119,7 +119,7 @@ sfnb-setup generate-eai --config config.yaml --output eai_setup.sql
 | `binstar-cio-packages-prod.s3.amazonaws.com` | Anaconda S3 storage |
 | `conda.anaconda.org` | conda-forge package index |
 | `repo.anaconda.com` | conda-forge CDN |
-| `pypi.org` | PyPI index (sfnb-multilang, rpy2, JPype1) |
+| `pypi.org` | PyPI index (snowflake-notebook-polyglot, rpy2, JPype1) |
 | `files.pythonhosted.org` | PyPI file downloads |
 | `github.com` | GitHub repos and source archives |
 | `api.github.com` | GitHub API (pak dependency resolution) |
@@ -185,7 +185,7 @@ CREATE OR REPLACE EXTERNAL ACCESS INTEGRATION MULTILANG_NOTEBOOK_EAI
   ENABLED = TRUE;
 ```
 
-This applies to both the `sfnb-multilang` installer's Phase 0
+This applies to both the `snowflake-notebook-polyglot` installer's Phase 0
 network rule setup and the `sfnb_setup.py` helper's EAI generation.
 See [custom_mirrors.md -- Authenticated Mirrors](custom_mirrors.md#authenticated-mirrors)
 for the full setup guide.

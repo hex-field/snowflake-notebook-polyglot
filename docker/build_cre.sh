@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build, validate, tag, and optionally push the sfnb-multilang R CRE image.
+# Build, validate, tag, and optionally push the snowflake-notebook-polyglot R CRE image.
 #
 # Prerequisites:
 #   - Docker with buildx
@@ -12,7 +12,7 @@
 #
 # Optional:
 #   PUSH=1 ./docker/build_cre.sh
-#   CRE_NAME=sfnb_multilang_r ./docker/build_cre.sh   # print CREATE CRE SQL after push
+#   CRE_NAME=sfnb_polyglot_r ./docker/build_cre.sh   # print CREATE CRE SQL after push
 
 set -euo pipefail
 
@@ -23,7 +23,7 @@ GEN_DIR="${SCRIPT_DIR}/generated"
 # Default runtime YAML for bare build_cre.sh (create_cre.sh overwrites this).
 if [[ ! -f "${GEN_DIR}/cre_runtime.yaml" ]]; then
   mkdir -p "${GEN_DIR}"
-  cp "${REPO_ROOT}/configs/cre_multilang_r.yaml" "${GEN_DIR}/cre_runtime.yaml"
+  cp "${REPO_ROOT}/configs/cre_polyglot_r.yaml" "${GEN_DIR}/cre_runtime.yaml"
 fi
 if [[ ! -f "${GEN_DIR}/cre_extra_install.sh" ]]; then
   mkdir -p "${GEN_DIR}"
@@ -31,7 +31,7 @@ if [[ ! -f "${GEN_DIR}/cre_extra_install.sh" ]]; then
     'echo "  (no extra packages in profile)"' > "${GEN_DIR}/cre_extra_install.sh"
 fi
 
-IMAGE_TAG="${IMAGE_TAG:-sfnb-multilang-r:v1}"
+IMAGE_TAG="${IMAGE_TAG:-sfnb-polyglot-r:v1}"
 SNOWBOOKS_TAG="${SNOWBOOKS_TAG:-2.5.0}"
 PLATFORM="${PLATFORM:-linux/amd64}"
 
@@ -45,14 +45,14 @@ fi
 echo "==> Building ${IMAGE_TAG} (snowbooks:${SNOWBOOKS_TAG}, ${PLATFORM})"
 CRE_IMAGE_TAG="${CRE_IMAGE_TAG:-v1}"
 SFNB_CRE_ADBC="${SFNB_CRE_ADBC:-1}"
-SFNB_CONFIG_PATH="${SFNB_CONFIG_PATH:-/opt/sfnb/config/cre_multilang_r.yaml}"
+SFNB_CONFIG_PATH="${SFNB_CONFIG_PATH:-/opt/sfnb/config/cre_polyglot_r.yaml}"
 docker build --platform "${PLATFORM}" \
   --build-arg REGISTRY_URL="${REGISTRY_URL}" \
   --build-arg SNOWBOOKS_TAG="${SNOWBOOKS_TAG}" \
   --build-arg SFNB_CRE_IMAGE_TAG="${CRE_IMAGE_TAG}" \
   --build-arg SFNB_CRE_ADBC="${SFNB_CRE_ADBC}" \
   --build-arg SFNB_CONFIG_PATH="${SFNB_CONFIG_PATH}" \
-  -f "${REPO_ROOT}/docker/Dockerfile.multilang-r" \
+  -f "${REPO_ROOT}/docker/Dockerfile.polyglot-r" \
   -t "${IMAGE_TAG}" \
   "${REPO_ROOT}"
 
@@ -84,7 +84,7 @@ echo "==> Tagging and pushing ${REMOTE}"
 docker tag "${IMAGE_TAG}" "${REMOTE}"
 docker push "${REMOTE}"
 
-CRE_NAME="${CRE_NAME:-sfnb_multilang_r}"
+CRE_NAME="${CRE_NAME:-sfnb_polyglot_r}"
 echo ""
 echo "==> Register the Custom Runtime Environment (run in Snowflake):"
 echo "CREATE CUSTOM RUNTIME ENVIRONMENT ${CRE_NAME}"

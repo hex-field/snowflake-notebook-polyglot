@@ -1,7 +1,7 @@
 # Scala/Java Smoke Test -- Snowflake Workspace Notebook
 
 Minimal validation that Scala and Java execute correctly in a Snowflake
-Workspace Notebook via the sfnb-multilang toolkit.
+Workspace Notebook via the snowflake-notebook-polyglot toolkit.
 
 ## What This Tests
 

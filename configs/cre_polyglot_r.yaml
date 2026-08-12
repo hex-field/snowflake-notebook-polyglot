@@ -1,16 +1,16 @@
 # =============================================================================
 # Custom Runtime Environment (CRE) — R + snowflakeR + ADBC preset (reference image tag v1)
 # =============================================================================
-# Use with a Workspace Notebook backed by cre@sfnb_multilang_r (or your CRE
+# Use with a Workspace Notebook backed by cre@sfnb_polyglot_r (or your CRE
 # name). The CRE image pre-installs micromamba, workspace_env, snowflakeR,
-# RSnowflake, ADBC, rpy2, sfnb-multilang, and auto-registers %%R at kernel
+# RSnowflake, ADBC, rpy2, snowflake-notebook-polyglot, and auto-registers %%R at kernel
 # start (empty git repo is fine).
 #
 # Build/register: see docs/custom_runtime_images.md
 #
 # Usage (setup cell — same as always):
 #   from sfnb_setup import setup_notebook
-#   setup_notebook(config="cre_multilang_r.yaml", packages=["snowflakeR", "RSnowflake"])
+#   setup_notebook(config="cre_polyglot_r.yaml", packages=["snowflakeR", "RSnowflake"])
 # =============================================================================
 
 env_name: "workspace_env"

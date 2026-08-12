@@ -7,8 +7,8 @@ import tempfile
 
 import pytest
 
-from sfnb_multilang.config import ToolkitConfig, apply_cli_overrides
-from sfnb_multilang.network_rules import (
+from sfnb_polyglot.config import ToolkitConfig, apply_cli_overrides
+from sfnb_polyglot.network_rules import (
     SHARED_HOSTS,
     export_eai_sql,
     generate_network_rule_sql,

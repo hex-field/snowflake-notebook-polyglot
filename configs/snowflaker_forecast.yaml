@@ -6,7 +6,7 @@
 # that fail in Workspace Notebooks).
 #
 # Usage:
-#   from sfnb_multilang import install
+#   from sfnb_polyglot import install
 #   install(config="configs/snowflaker_forecast.yaml")
 #
 #   # or CLI:

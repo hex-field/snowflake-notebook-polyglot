@@ -43,7 +43,7 @@ This single call:
    introspection, checks required domains, and adds any that are missing
    (via `ALTER NETWORK RULE` on a managed EAI, or by creating a supplementary
    `MULTILANG_NOTEBOOK_EAI`).
-3. **Installs the R runtime** -- pip-installs `sfnb-multilang`, then runs
+3. **Installs the R runtime** -- pip-installs `snowflake-notebook-polyglot`, then runs
    micromamba + conda-forge (~45 sec fresh, ~2 sec cached).
 4. **Installs R packages** -- from tarball URLs, local `.tar.gz` files, or
    GitHub via `pak` (configured in the YAML).
@@ -107,12 +107,12 @@ The EAI allows outbound HTTPS to these hosts:
 | `binstar-cio-packages-prod.s3.amazonaws.com` | Anaconda S3 storage |
 | `cloud.r-project.org` | CRAN package downloads |
 | `bioconductor.org` | Bioconductor config (pak init) |
-| `github.com` | GitHub repos (sfnb-multilang, snowflakeR, RSnowflake) |
+| `github.com` | GitHub repos (snowflake-notebook-polyglot, snowflakeR, RSnowflake) |
 | `api.github.com` | GitHub API (pak dependency resolution) |
 | `codeload.github.com` | GitHub source archives |
 | `objects.githubusercontent.com` | GitHub raw content |
 | `release-assets.githubusercontent.com` | GitHub release asset downloads |
-| `pypi.org` | PyPI index (sfnb-multilang, rpy2) |
+| `pypi.org` | PyPI index (snowflake-notebook-polyglot, rpy2) |
 | `files.pythonhosted.org` | PyPI file downloads |
 
 ## Prerequisites

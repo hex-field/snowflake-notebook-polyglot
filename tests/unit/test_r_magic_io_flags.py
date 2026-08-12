@@ -1,6 +1,6 @@
 """Tests for %%R magic -i/-o flag normalization."""
 
-from sfnb_multilang.helpers.r_helpers import _normalize_r_magic_io_flags
+from sfnb_polyglot.helpers.r_helpers import _normalize_r_magic_io_flags
 
 
 def test_o_list_spaces_after_comma():

@@ -5,7 +5,7 @@
 # Includes ADBC for high-performance Arrow-native reads/writes.
 #
 # Usage:
-#   from sfnb_multilang import install
+#   from sfnb_polyglot import install
 #   install(config="configs/rsnowflake.yaml")
 #
 #   # or CLI:

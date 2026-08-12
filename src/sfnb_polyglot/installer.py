@@ -30,7 +30,7 @@ from .shared.micromamba import ensure_micromamba
 from .shared.preflight import run_preflight_checks
 from .shared.subprocess_utils import run_cmd
 
-logger = logging.getLogger("sfnb_multilang.installer")
+logger = logging.getLogger("sfnb_polyglot.installer")
 
 
 # ---------------------------------------------------------------------------

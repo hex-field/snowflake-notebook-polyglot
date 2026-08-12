@@ -26,7 +26,7 @@ and session context in a single call. See the
 In a notebook cell:
 
 ```python
-!pip install sfnb-multilang
+!pip install snowflake-notebook-polyglot
 ```
 
 ### Step 2: Configure Network Access
@@ -36,7 +36,7 @@ the toolkit can attempt to create the EAI. If your role has
 `CREATE INTEGRATION` privilege:
 
 ```python
-from sfnb_multilang import apply_eai
+from sfnb_polyglot import apply_eai
 apply_eai(session, languages=["r", "scala"])
 ```
 
@@ -52,7 +52,7 @@ Workspace Notebooks.
 ### Step 3: Install Languages
 
 ```python
-from sfnb_multilang import install
+from sfnb_polyglot import install
 
 # Install R and Scala
 install(languages=["r", "scala"])
@@ -116,7 +116,7 @@ df = DataFrame(x=1:10, y=rand(10))
 describe(df)
 ```
 
-## Multi-Language Cell Ordering (Scala + Julia)
+## Polyglot Cell Ordering (Scala + Julia)
 
 When using **both Scala and Julia** in the same notebook, the setup
 cells must follow a specific order. The JVM (started by
@@ -177,7 +177,7 @@ languages:
 Then:
 
 ```python
-from sfnb_multilang import install
+from sfnb_polyglot import install
 install(config="config.yaml")
 ```
 

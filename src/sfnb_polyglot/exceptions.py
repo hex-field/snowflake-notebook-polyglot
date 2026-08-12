@@ -1,4 +1,4 @@
-"""Typed exception hierarchy for the multi-language toolkit.
+"""Typed exception hierarchy for the polyglot toolkit.
 
 All toolkit exceptions inherit from ToolkitError so callers can catch
 a single base class while still distinguishing specific failure modes.

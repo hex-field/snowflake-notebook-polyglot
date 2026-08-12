@@ -11,9 +11,9 @@
 
 cre:
   # Snowflake Custom Runtime Environment name (SQL identifier)
-  name: sfnb_multilang_r
+  name: sfnb_polyglot_r
   # Docker image name:tag (also used for CRE IMAGE_PATH tail)
-  image: sfnb-multilang-r
+  image: sfnb-polyglot-r
   tag: v1
   # Label stamped in /opt/sfnb/CRE_VERSION inside the image
   version_label: v1
@@ -22,7 +22,7 @@ cre:
   # Bake ADBC (adbcsnowflake) — adds ~2–3 min to image build
   adbc: true
   # YAML copied to /opt/sfnb/config/ in the image (default: lean v1 preset)
-  runtime_config: cre_multilang_r.yaml
+  runtime_config: cre_polyglot_r.yaml
 
 snowflake:
   # Account image registry host (from SHOW IMAGE REPOSITORIES / Snowsight)

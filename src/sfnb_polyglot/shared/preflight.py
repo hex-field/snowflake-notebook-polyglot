@@ -13,7 +13,7 @@ from typing import List
 
 from ..config import ToolkitConfig
 
-logger = logging.getLogger("sfnb_multilang.shared.preflight")
+logger = logging.getLogger("sfnb_polyglot.shared.preflight")
 
 MIN_DISK_SPACE_MB = 2000
 
@@ -45,7 +45,7 @@ def check_network(endpoints: List[str], timeout: int = 5) -> dict[str, bool]:
     results = {}
     for url in endpoints:
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "sfnb-multilang"})
+            req = urllib.request.Request(url, headers={"User-Agent": "snowflake-notebook-polyglot"})
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 resp.read(64)
             results[url] = True

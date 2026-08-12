@@ -6,7 +6,7 @@
 # plus XGBoost and ranger engines -- all pre-compiled from conda-forge.
 #
 # Usage:
-#   from sfnb_multilang import install
+#   from sfnb_polyglot import install
 #   install(config="configs/snowflaker_credit_risk.yaml")
 #
 #   # or CLI:

@@ -1,7 +1,7 @@
 # Julia Smoke Test -- Snowflake Workspace Notebook
 
 Minimal validation that Julia executes correctly in a Snowflake Workspace
-Notebook via the sfnb-multilang toolkit.
+Notebook via the snowflake-notebook-polyglot toolkit.
 
 ## What This Tests
 

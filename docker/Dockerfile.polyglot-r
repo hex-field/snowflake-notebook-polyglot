@@ -6,8 +6,8 @@
 # Build (replace REGISTRY_URL with your account registry from `snow spcs image-registry login`):
 #   docker build --platform linux/amd64 \
 #     --build-arg REGISTRY_URL=<account>.registry.snowflakecomputing.com \
-#     -f docker/Dockerfile.multilang-r \
-#     -t sfnb-multilang-r:v1 .
+#     -f docker/Dockerfile.polyglot-r \
+#     -t sfnb-polyglot-r:v1 .
 
 ARG REGISTRY_URL
 ARG SNOWBOOKS_TAG=2.5.0
@@ -23,7 +23,7 @@ ENV SFNB_ENV_NAME=workspace_env
 ENV SFNB_MICROMAMBA_ROOT=/home/jupyter/micromamba
 ENV SFNB_HELPERS_PATH=/opt/sfnb/helpers
 ENV SFNB_CRE_ADBC=1
-ARG SFNB_CONFIG_PATH=/opt/sfnb/config/cre_multilang_r.yaml
+ARG SFNB_CONFIG_PATH=/opt/sfnb/config/cre_polyglot_r.yaml
 ENV SFNB_CONFIG_PATH=${SFNB_CONFIG_PATH}
 
 USER root

@@ -5,7 +5,7 @@
 # Store, SPCS admin).  Includes tidyverse, dbplyr, and reticulate.
 #
 # Usage:
-#   from sfnb_multilang import install
+#   from sfnb_polyglot import install
 #   install(config="configs/snowflaker.yaml")
 #
 #   # or CLI:

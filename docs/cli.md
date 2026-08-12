@@ -1,9 +1,9 @@
 # CLI Reference
 
 The `sfnb-setup` command-line interface provides direct access to the
-multi-language toolkit installer, EAI SQL generator, and installation
+polyglot toolkit installer, EAI SQL generator, and installation
 validator. It is registered as a console entry point when the
-`sfnb-multilang` package is installed.
+`snowflake-notebook-polyglot` package is installed.
 
 Most users should use `setup_notebook()` from `sfnb_setup.py` -- it
 wraps the same installer with automatic EAI discovery, session context
@@ -19,12 +19,12 @@ automation pipelines, and container image builds.
 | Local development | `pip install -e . && sfnb-setup --help` | Dry-run, generate EAI SQL, migrate configs |
 | Dockerfile / CI | `RUN sfnb-setup install --r --quiet` | Pre-bake R/Scala/Julia into a custom container image |
 
-The `sfnb-setup` command requires `sfnb-multilang` to be installed
+The `sfnb-setup` command requires `snowflake-notebook-polyglot` to be installed
 first. In a Workspace Notebook, this happens automatically when you
 use `setup_notebook()`. For standalone CLI use:
 
 ```bash
-pip install sfnb-multilang
+pip install snowflake-notebook-polyglot
 sfnb-setup --help
 ```
 
@@ -213,7 +213,7 @@ sfnb-setup migrate-config \
 
 ```dockerfile
 FROM snowflake-notebook-base:latest
-RUN pip install sfnb-multilang
+RUN pip install snowflake-notebook-polyglot
 COPY config.yaml .
 RUN sfnb-setup install --config config.yaml --no-eai --quiet
 ```
@@ -227,7 +227,7 @@ container runs as a Workspace Notebook service.
 | Capability | `setup_notebook()` | `sfnb-setup` CLI |
 |---|---|---|
 | **Primary audience** | Notebook users | Power users, CI/CD, admins |
-| **Where it runs** | Workspace Notebook Python cell | Any shell with `sfnb-multilang` installed |
+| **Where it runs** | Workspace Notebook Python cell | Any shell with `snowflake-notebook-polyglot` installed |
 | **EAI discovery** | Multi-tier auto-discovery (DESC SERVICE, settings.json, SHOW INTEGRATIONS) | Phase 0 only (CREATE/ALTER via session, or export SQL) |
 | **Session context** | Reads `context:` from YAML, sets USE DATABASE/SCHEMA/WAREHOUSE | No session awareness |
 | **R package tarballs** | Installs from URL, local path, or glob search with GitHub fallback | Not handled (conda + CRAN packages only) |

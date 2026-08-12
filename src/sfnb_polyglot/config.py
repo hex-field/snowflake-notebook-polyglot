@@ -116,8 +116,8 @@ class RegistryConfig:
 class NetworkRuleConfig:
     apply_in_installer: bool = True
     account: str = ""
-    rule_name: str = "multilang_notebook_egress"
-    integration_name: str = "multilang_notebook_eai"
+    rule_name: str = "polyglot_notebook_egress"
+    integration_name: str = "polyglot_notebook_eai"
     grant_to_role: str = ""
     sql_export_path: str = "./eai_setup.sql"
 
@@ -294,8 +294,8 @@ def _build_config(raw: dict) -> ToolkitConfig:
     cfg.network_rule = NetworkRuleConfig(
         apply_in_installer=bool(nr_raw.get("apply_in_installer", True)),
         account=str(nr_raw.get("account", "")),
-        rule_name=str(nr_raw.get("rule_name", "multilang_notebook_egress")),
-        integration_name=str(nr_raw.get("integration_name", "multilang_notebook_eai")),
+        rule_name=str(nr_raw.get("rule_name", "polyglot_notebook_egress")),
+        integration_name=str(nr_raw.get("integration_name", "polyglot_notebook_eai")),
         grant_to_role=str(nr_raw.get("grant_to_role", "")),
         sql_export_path=str(nr_raw.get("sql_export_path", "./eai_setup.sql")),
     )

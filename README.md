@@ -1,20 +1,41 @@
-# snowflake-notebook-multilang <img src="docs/logo.png" align="right" height="139" />
+# snowflake-notebook-polyglot <img src="docs/logo.png" align="right" height="139" />
 
-Multi-language support (R, Scala/Java, Julia) for Snowflake Workspace Notebooks.
+Polyglot support (R, Scala/Java, Julia) for Snowflake Workspace Notebooks.
 
 This toolkit installs and configures language runtimes, packages, and
 notebook magic commands so you can use R, Scala, Java, and Julia alongside
 Python in Snowflake Workspace Notebooks.
 
 > **Community Project -- Not Officially Supported**
-> This is a community-developed project from
-> [Snowflake Labs](https://github.com/Snowflake-Labs), not an official
-> Snowflake offering. It is provided **as-is** without warranty or official
-> Snowflake support. Use it for prototyping and experimentation; production
-> use is at your own risk. Feedback, bug reports, and contributions are
-> welcome via [GitHub Issues](https://github.com/Snowflake-Labs/snowflake-notebook-multilang/issues).
+> This is an independent, community-developed project maintained by
+> [Hex Field Ltd](https://github.com/hex-field). It is **not** an official Snowflake
+> offering, and is not affiliated with, endorsed by, or supported by Snowflake
+> Inc. It is provided **as-is** without warranty. Use it for prototyping and
+> experimentation; production use is at your own risk. Feedback, bug reports
+> and contributions are welcome via
+> [GitHub Issues](https://github.com/hex-field/snowflake-notebook-polyglot/issues).
 
-> **Author:** [Simon Field](https://www.linkedin.com/in/fieldy6961) — SnowCAT
+> **Maintainer:** [Simon Field](https://www.linkedin.com/in/fieldy6961) — Hex Field
+
+## Relationship to the original project
+
+This project is a fork of
+[snowflake-notebook-multilang](https://github.com/Snowflake-Labs/snowflake-notebook-multilang),
+originally developed at Snowflake Labs by Simon Field and licensed under the
+Apache License 2.0. Copyright in the original work remains with Snowflake Inc.
+
+It was forked at commit `497875f` (12 June 2026) and has been **modified**: the
+project was renamed to `snowflake-notebook-polyglot`, the Python package from
+`sfnb_multilang` to `sfnb_polyglot`, and maintenance moved to Hex Field from
+version 0.2.0 onwards. See [CHANGELOG.md](CHANGELOG.md) for the full record and
+[NOTICE](NOTICE) for attribution.
+
+Snowflake is not developing the original project. Existing users may continue
+using it as-is, or move to this fork, which is actively maintained. The two are
+not interoperable in-place: the import name and several object names differ.
+
+*Snowflake, Snowpark and Snowflake Notebooks are trademarks of Snowflake Inc.,
+used here only to describe what this software works with.*
 
 ## Quick Start
 
@@ -28,17 +49,17 @@ setup_notebook(config="my_config.yaml", packages=["snowflakeR"])
 ```
 
 `sfnb_setup.py` is a standalone bootstrap file (no pip install required)
-that you upload alongside your notebook. It pip-installs `sfnb-multilang`
+that you upload alongside your notebook. It pip-installs `snowflake-notebook-polyglot`
 on first run and orchestrates the full setup.
 
-**Alternative** -- use the `sfnb-multilang` API directly:
+**Alternative** -- use the `snowflake-notebook-polyglot` API directly:
 
 ```python
 # Cell 1: Install the toolkit
-!pip install sfnb-multilang
+!pip install snowflake-notebook-polyglot
 
 # Cell 2: Install R and Scala
-from sfnb_multilang import install
+from sfnb_polyglot import install
 install(languages=["r", "scala"])
 ```
 
@@ -79,7 +100,7 @@ car_df.sort(col("efficiency").desc).show()
 ## Installation
 
 ```bash
-pip install sfnb-multilang
+pip install snowflake-notebook-polyglot
 ```
 
 ## Usage
@@ -114,7 +135,7 @@ setup_notebook(config="my_config.yaml", packages=["snowflakeR"])
 ### From a Notebook Cell (Programmatic API)
 
 ```python
-from sfnb_multilang import install, generate_eai_sql, apply_eai
+from sfnb_polyglot import install, generate_eai_sql, apply_eai
 
 # Install with a config file
 install(config="config.yaml")

@@ -159,8 +159,8 @@ practice you'd typically set both to conda-forge.
 |---|---|---|
 | `apply_in_installer` | `true` | Try to apply EAI in Phase 0 |
 | `account` | `""` | Snowflake account (auto-detected if empty) |
-| `rule_name` | `multilang_notebook_egress` | Network rule name |
-| `integration_name` | `multilang_notebook_eai` | EAI name |
+| `rule_name` | `polyglot_notebook_egress` | Network rule name |
+| `integration_name` | `polyglot_notebook_eai` | EAI name |
 | `grant_to_role` | `""` | Role to `GRANT USAGE ON INTEGRATION` to (allows that role to attach the EAI to notebooks) |
 | `sql_export_path` | `./eai_setup.sql` | File path for SQL on failure |
 

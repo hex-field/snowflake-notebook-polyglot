@@ -33,13 +33,13 @@ Publish **tags aligned to snowbooks / Container Runtime**, not ad-hoc `:latest` 
 
 | Tag | CRE name | snowbooks / runtime | `%%R` auto | ADBC | Notes |
 |-----|----------|---------------------|------------|------|-------|
-| **v1** | `sfnb_multilang_r` | 2.5.x CPU | **Yes** | **Yes** | **Lean reference (CPU)** — fast startup |
-| **ml-v1** | `sfnb_multilang_ml` | 2.5.x CPU | **Yes** | **Yes** | **ML demos** — tidymodels, xgboost, forecast, credit risk |
-| v1-gpu | `sfnb_multilang_r_gpu` | 2.5.x **GPU** | Yes | Optional | Separate image + `BASE_IMAGE_TYPE = GPU` |
+| **v1** | `sfnb_polyglot_r` | 2.5.x CPU | **Yes** | **Yes** | **Lean reference (CPU)** — fast startup |
+| **ml-v1** | `sfnb_polyglot_ml` | 2.5.x CPU | **Yes** | **Yes** | **ML demos** — tidymodels, xgboost, forecast, credit risk |
+| v1-gpu | `sfnb_polyglot_r_gpu` | 2.5.x **GPU** | Yes | Optional | Separate image + `BASE_IMAGE_TYPE = GPU` |
 
 Earlier internal image experiments were not published as a separate version. If your registry still has `:v2` from development, it is the same recipe as **v1** — rebuild and tag `:v1` for new rollouts.
 
-Build CPU and GPU images as **separate CRE objects** (`sfnb_multilang_r`, `sfnb_multilang_r_gpu`).
+Build CPU and GPU images as **separate CRE objects** (`sfnb_polyglot_r`, `sfnb_polyglot_r_gpu`).
 Customers rebuild from this repo with `docker/create_cre.sh` and their own registry path —
 there is no shared public pull URL (CRE images live in **your account's** image repository).
 
@@ -52,9 +52,9 @@ there is no shared public pull URL (CRE images live in **your account's** image 
 | snowflakeR + RSnowflake | R library in env | GitHub release tarballs at **image build** time |
 | **ADBC (v1)** | R library + conda | `adbcdrivermanager`, `adbcsnowflake`, … |
 | rpy2, tabulate | Notebook Python | pip at image build |
-| **sfnb-multilang** | Notebook Python | `setup_notebook`, `enable_r_cells`, … |
+| **snowflake-notebook-polyglot** | Notebook Python | `setup_notebook`, `enable_r_cells`, … |
 | **`%%R` auto-registration** | `~/.ipython/.../startup/` | Kernel startup hook |
-| `cre_multilang_r.yaml` | `/opt/sfnb/config/` | Optional `setup_notebook()` preset |
+| `cre_polyglot_r.yaml` | `/opt/sfnb/config/` | Optional `setup_notebook()` preset |
 
 The image **extends** the official **snowbooks** ML runtime base (required for CRE validation).
 
@@ -112,21 +112,21 @@ Outputs: `docker/generated/cre_extra_install.sh`, `cre_profile.env`, `cre_regist
 
 ### ML demo image (`ml-v1`) — credit risk / Model Registry / Posit briefings
 
-Keep **`sfnb_multilang_r` (v1)** for fast interop and Feature Store-only notebooks. Build a **second** CRE for end-to-end ML:
+Keep **`sfnb_polyglot_r` (v1)** for fast interop and Feature Store-only notebooks. Build a **second** CRE for end-to-end ML:
 
 ```bash
 cp configs/sfnb_ml.example.yaml configs/sfnb_ml.yaml
 # edit registry_url, image_repo_path
 ./docker/create_cre.sh configs/sfnb_ml.yaml
 PUSH=1 SNOW_CONNECTION=your_connection ./docker/create_cre.sh configs/sfnb_ml.yaml
-# Run printed cre_register.sql → cre@sfnb_multilang_ml
+# Run printed cre_register.sql → cre@sfnb_polyglot_ml
 ```
 
-Bakes **tidymodels**, **xgboost**, **ranger**, **forecast**, **foreach/iterators**, snowflakeR **0.2.0**, and `cre_multilang_ml.yaml` at `/opt/sfnb/config/`. Attach credit-risk notebooks to `cre@sfnb_multilang_ml`; optional setup cell:
+Bakes **tidymodels**, **xgboost**, **ranger**, **forecast**, **foreach/iterators**, snowflakeR **0.2.0**, and `cre_polyglot_ml.yaml` at `/opt/sfnb/config/`. Attach credit-risk notebooks to `cre@sfnb_polyglot_ml`; optional setup cell:
 
 ```python
 from sfnb_setup import setup_notebook
-setup_notebook(config="/opt/sfnb/config/cre_multilang_ml.yaml",
+setup_notebook(config="/opt/sfnb/config/cre_polyglot_ml.yaml",
                packages=["snowflakeR", "RSnowflake"])
 ```
 
@@ -144,7 +144,7 @@ Find the host in Snowsight (**Admin → Image repositories**) or `SHOW IMAGE REP
 ### 2. Build and validate
 
 ```bash
-cd snowflake-notebook-multilang
+cd snowflake-notebook-polyglot
 export REGISTRY_URL="yourorg-youracct.registry.snowflakecomputing.com"
 ./docker/build_cre.sh
 # or: ./docker/create_cre.sh configs/my_org.yaml
@@ -162,11 +162,11 @@ PUSH=1 ./docker/build_cre.sh
 ### 4. Register CRE
 
 ```sql
-CREATE OR REPLACE CUSTOM RUNTIME ENVIRONMENT sfnb_multilang_r
-    IMAGE_PATH = '/mydb/myschema/my_repo/sfnb-multilang-r:v1'
+CREATE OR REPLACE CUSTOM RUNTIME ENVIRONMENT sfnb_polyglot_r
+    IMAGE_PATH = '/mydb/myschema/my_repo/sfnb-polyglot-r:v1'
     BASE_IMAGE_TYPE = CPU;
 
-GRANT USAGE ON CUSTOM RUNTIME ENVIRONMENT sfnb_multilang_r TO ROLE <notebook_role>;
+GRANT USAGE ON CUSTOM RUNTIME ENVIRONMENT sfnb_polyglot_r TO ROLE <notebook_role>;
 ```
 
 Use `BASE_IMAGE_TYPE = GPU` only for images built from the **GPU** snowbooks base.
@@ -181,7 +181,7 @@ Use `BASE_IMAGE_TYPE = GPU` only for images built from the **GPU** snowbooks bas
 EXECUTE NOTEBOOK PROJECT MYDB.MYSCHEMA.MY_PROJECT
     MAIN_FILE = 'notebook.ipynb'
     COMPUTE_POOL = 'SYSTEM_COMPUTE_POOL_CPU'
-    RUNTIME = 'cre@sfnb_multilang_r'
+    RUNTIME = 'cre@sfnb_polyglot_r'
     QUERY_WAREHOUSE = 'MY_WH';
 ```
 
@@ -199,7 +199,7 @@ Optional context-only bootstrap:
 
 ```python
 from sfnb_setup import setup_notebook
-setup_notebook(config="/opt/sfnb/config/cre_multilang_r.yaml", packages=["snowflakeR", "RSnowflake"])
+setup_notebook(config="/opt/sfnb/config/cre_polyglot_r.yaml", packages=["snowflakeR", "RSnowflake"])
 ```
 
 ## Expected startup times

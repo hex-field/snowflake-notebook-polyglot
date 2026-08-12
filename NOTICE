@@ -1,0 +1,22 @@
+snowflake-notebook-polyglot
+Copyright 2026 Hex Field Ltd
+
+This product includes software originally developed at Snowflake Inc.
+Copyright 2026 Snowflake Inc.
+
+Originating project:  snowflake-notebook-multilang (Snowflake Labs)
+Original author:      Simon Field
+Fork point:           497875fdab0c73132e4908e76f02796b85e92a06 (2026-06-12)
+
+This is a fork. The project was renamed from snowflake-notebook-multilang to
+snowflake-notebook-polyglot, and the Python package from sfnb_multilang to
+sfnb_polyglot, at version 0.2.0. Files have been modified from their original
+form; see CHANGELOG.md for the record of changes.
+
+Licensed under the Apache License, Version 2.0. You may obtain a copy of the
+License at http://www.apache.org/licenses/LICENSE-2.0
+
+Snowflake, Snowpark and Snowflake Notebooks are trademarks of Snowflake Inc.
+This project is not affiliated with, endorsed by, or supported by Snowflake
+Inc. Those names are used only to describe what this software interoperates
+with.

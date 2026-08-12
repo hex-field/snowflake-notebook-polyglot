@@ -7,7 +7,7 @@ import logging
 import time
 from typing import Callable, TypeVar
 
-logger = logging.getLogger("sfnb_multilang.shared.download")
+logger = logging.getLogger("sfnb_polyglot.shared.download")
 
 F = TypeVar("F", bound=Callable)
 

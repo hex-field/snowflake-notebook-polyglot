@@ -19,7 +19,7 @@ from ..shared.download import retry
 from ..shared.subprocess_utils import run_cmd
 from .base import LanguagePlugin, PluginResult
 
-logger = logging.getLogger("sfnb_multilang.languages.julia")
+logger = logging.getLogger("sfnb_polyglot.languages.julia")
 
 
 class JuliaPlugin(LanguagePlugin):

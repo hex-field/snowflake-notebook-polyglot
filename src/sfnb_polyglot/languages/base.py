@@ -9,7 +9,7 @@ from typing import Any, Optional
 
 from ..exceptions import PackageConflictError
 
-logger = logging.getLogger("sfnb_multilang.languages.base")
+logger = logging.getLogger("sfnb_polyglot.languages.base")
 
 
 # ---------------------------------------------------------------------------

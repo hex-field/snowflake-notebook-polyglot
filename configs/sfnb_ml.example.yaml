@@ -8,21 +8,21 @@
 #
 #   PUSH=1 SNOW_CONNECTION=my_conn ./docker/create_cre.sh configs/sfnb_ml.yaml
 #
-# Register as a SEPARATE CRE from sfnb_multilang_r (v1). Analysts pick:
-#   cre@sfnb_multilang_r   — lean, fast startup (interop, Feature Store)
-#   cre@sfnb_multilang_ml  — full ML stack (credit risk Posit demo)
+# Register as a SEPARATE CRE from sfnb_polyglot_r (v1). Analysts pick:
+#   cre@sfnb_polyglot_r   — lean, fast startup (interop, Feature Store)
+#   cre@sfnb_polyglot_ml  — full ML stack (credit risk Posit demo)
 # =============================================================================
 
 cre:
-  name: sfnb_multilang_ml
-  image: sfnb-multilang-r
+  name: sfnb_polyglot_ml
+  image: sfnb-polyglot-r
   tag: ml-v1
   version_label: ml-v1
   r_version: "4.5.2"
   snowbooks_tag: "2.5.0"
   adbc: true
   # Runtime YAML copied into the image at /opt/sfnb/config/
-  runtime_config: cre_multilang_ml.yaml
+  runtime_config: cre_polyglot_ml.yaml
 
 snowflake:
   registry_url: "<account>.registry.snowflakecomputing.com"

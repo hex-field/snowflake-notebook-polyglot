@@ -12,7 +12,7 @@ if os.environ.get("SFNB_CUSTOM_RUNTIME", "").strip().lower() not in (
 else:
     try:
         try:
-            from sfnb_multilang.helpers.r_helpers import setup_r_environment
+            from sfnb_polyglot.helpers.r_helpers import setup_r_environment
         except ImportError:
             import sys
 

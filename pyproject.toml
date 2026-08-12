@@ -3,16 +3,19 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "sfnb-multilang"
-version = "0.1.3"
-description = "Multi-language support (R, Scala/Java, Julia) for Snowflake Workspace Notebooks"
+name = "snowflake-notebook-polyglot"
+version = "0.2.0"
+description = "Polyglot support (R, Scala/Java, Julia) for Snowflake Workspace Notebooks"
 readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.9"
 authors = [
-    {name = "Snowflake-Labs"},
+    {name = "Simon Field", email = "simon@hexfield.ai"},
 ]
-keywords = ["snowflake", "notebook", "multilang", "R", "scala", "julia"]
+maintainers = [
+    {name = "Hex Field", email = "simon@hexfield.ai"},
+]
+keywords = ["snowflake", "notebook", "polyglot", "R", "scala", "julia"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -38,15 +41,15 @@ dev = [
 ]
 
 [project.scripts]
-sfnb-setup = "sfnb_multilang.cli:main"
+sfnb-setup = "sfnb_polyglot.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/Snowflake-Labs/snowflake-notebook-multilang"
-Documentation = "https://github.com/Snowflake-Labs/snowflake-notebook-multilang/tree/main/docs"
-Issues = "https://github.com/Snowflake-Labs/snowflake-notebook-multilang/issues"
+Homepage = "https://github.com/hex-field/snowflake-notebook-polyglot"
+Documentation = "https://github.com/hex-field/snowflake-notebook-polyglot/tree/main/docs"
+Issues = "https://github.com/hex-field/snowflake-notebook-polyglot/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/sfnb_multilang"]
+packages = ["src/sfnb_polyglot"]
 
 [tool.ruff]
 target-version = "py39"

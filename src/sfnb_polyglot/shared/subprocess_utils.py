@@ -8,7 +8,7 @@ import subprocess
 import time
 from typing import Optional
 
-logger = logging.getLogger("sfnb_multilang.shared.subprocess")
+logger = logging.getLogger("sfnb_polyglot.shared.subprocess")
 
 
 def run_cmd(

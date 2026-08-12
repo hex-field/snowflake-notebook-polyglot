@@ -11,7 +11,7 @@
 
 ```text
 Need R in Workspace Notebook?
-├─ Org can build/register CRE? → YES → cre@sfnb_multilang_r (CPU tag v1) or v1-gpu (GPU pool)
+├─ Org can build/register CRE? → YES → cre@sfnb_polyglot_r (CPU tag v1) or v1-gpu (GPU pool)
 │                                 NO  → setup_notebook() bootstrap cell + EAI
 └─ Git repo on /filesystem with renv?
     → Prefer CRE v1 or enable_r_cells(); avoid raw %load_ext rpy2

@@ -12,7 +12,7 @@ SFNB_CRE_ADBC="${SFNB_CRE_ADBC:-1}"
 CRAN_MIRROR="${SFNB_CRAN_MIRROR:-https://cloud.r-project.org}"
 CRE_IMAGE_TAG="${SFNB_CRE_IMAGE_TAG:-v1}"
 
-# Match configs/cre_multilang_r.yaml (snowflakeR + RSnowflake preset).
+# Match configs/cre_polyglot_r.yaml (snowflakeR + RSnowflake preset).
 CONDA_PACKAGES=(
   "r-base=${R_VERSION}"
   "r-cli"
@@ -37,7 +37,7 @@ ADBC_CONDA_PACKAGES=(
 SNOWFLAKER_TARBALL="${SNOWFLAKER_TARBALL:-https://github.com/Snowflake-Labs/snowflakeR/releases/download/v0.1.0/snowflakeR_0.1.0.tar.gz}"
 RSNOWFLAKE_TARBALL="${RSNOWFLAKE_TARBALL:-https://github.com/Snowflake-Labs/RSnowflake/releases/download/v0.2.0/RSnowflake_0.2.0.tar.gz}"
 
-echo "==> sfnb-multilang CRE pre-bake (${CRE_IMAGE_TAG}, env=${ENV_NAME}, R=${R_VERSION}, adbc=${SFNB_CRE_ADBC})"
+echo "==> snowflake-notebook-polyglot CRE pre-bake (${CRE_IMAGE_TAG}, env=${ENV_NAME}, R=${R_VERSION}, adbc=${SFNB_CRE_ADBC})"
 
 mkdir -p "${MM_ROOT}/bin"
 MM_BIN="${MM_ROOT}/bin/micromamba"
@@ -157,7 +157,7 @@ else
   echo "==> Skipping ADBC (SFNB_CRE_ADBC=${SFNB_CRE_ADBC})"
 fi
 
-# Notebook Python (snowbooks kernel) — rpy2 + sfnb-multilang toolkit + %%R auto-startup.
+# Notebook Python (snowbooks kernel) — rpy2 + snowflake-notebook-polyglot toolkit + %%R auto-startup.
 NOTEBOOK_PY=""
 for PY in /opt/python/cpython-*/bin/python3 /usr/bin/python3; do
   [[ -x "${PY}" ]] && NOTEBOOK_PY="${PY}" && break
@@ -168,22 +168,22 @@ if [[ -n "${NOTEBOOK_PY}" ]]; then
   "${NOTEBOOK_PY}" -m pip install -q --break-system-packages 'rpy2>=3.5,<4' tabulate \
     || echo "WARN: pip rpy2/tabulate failed"
 
-  echo "==> pip install sfnb-multilang (setup_notebook, enable_r_cells, …)"
+  echo "==> pip install snowflake-notebook-polyglot (setup_notebook, enable_r_cells, …)"
   if [[ -f /tmp/sfnb-pkg/pyproject.toml ]]; then
     "${NOTEBOOK_PY}" -m pip install -q --break-system-packages /tmp/sfnb-pkg \
       || echo "WARN: pip install local sfnb-pkg failed"
   else
-    SFNB_REF="${SFNB_MULTILANG_REF:-main}"
-    curl -fSL -o /tmp/sfnb-multilang.zip \
-      "https://github.com/Snowflake-Labs/snowflake-notebook-multilang/archive/refs/heads/${SFNB_REF}.zip"
-    unzip -q -o /tmp/sfnb-multilang.zip -d /tmp
+    SFNB_REF="${SFNB_POLYGLOT_REF:-main}"
+    curl -fSL -o /tmp/sfnb-polyglot.zip \
+      "https://github.com/hex-field/snowflake-notebook-polyglot/archive/refs/heads/${SFNB_REF}.zip"
+    unzip -q -o /tmp/sfnb-polyglot.zip -d /tmp
     "${NOTEBOOK_PY}" -m pip install -q --break-system-packages \
-      "/tmp/snowflake-notebook-multilang-${SFNB_REF}" \
-      || echo "WARN: pip install sfnb-multilang from GitHub failed"
-    rm -rf /tmp/sfnb-multilang.zip "/tmp/snowflake-notebook-multilang-${SFNB_REF}"
+      "/tmp/snowflake-notebook-polyglot-${SFNB_REF}" \
+      || echo "WARN: pip install snowflake-notebook-polyglot from GitHub failed"
+    rm -rf /tmp/sfnb-polyglot.zip "/tmp/snowflake-notebook-polyglot-${SFNB_REF}"
   fi
 else
-  echo "WARN: notebook Python not found — skip rpy2/sfnb-multilang pip install"
+  echo "WARN: notebook Python not found — skip rpy2/snowflake-notebook-polyglot pip install"
 fi
 
 # Profile-driven extras (rendered by docker/create_cre.sh → docker/generated/cre_extra_install.sh)
@@ -196,14 +196,14 @@ fi
 # Config + IPython startup: %%R registers when the kernel starts (empty git repo OK).
 SFNB_ROOT="/opt/sfnb"
 mkdir -p "${SFNB_ROOT}/config"
-CONFIG_PATH="${SFNB_CONFIG_PATH:-/opt/sfnb/config/cre_multilang_r.yaml}"
+CONFIG_PATH="${SFNB_CONFIG_PATH:-/opt/sfnb/config/cre_polyglot_r.yaml}"
 CONFIG_BASENAME="${CONFIG_PATH##*/}"
 if [[ -f /tmp/cre_runtime.yaml ]]; then
   cp /tmp/cre_runtime.yaml "${SFNB_ROOT}/config/${CONFIG_BASENAME}"
-elif [[ -f /tmp/cre_multilang_r.yaml ]]; then
-  cp /tmp/cre_multilang_r.yaml "${SFNB_ROOT}/config/${CONFIG_BASENAME}"
-elif [[ -f /tmp/sfnb-cre-assets/cre_multilang_r.yaml ]]; then
-  cp /tmp/sfnb-cre-assets/cre_multilang_r.yaml "${SFNB_ROOT}/config/${CONFIG_BASENAME}"
+elif [[ -f /tmp/cre_polyglot_r.yaml ]]; then
+  cp /tmp/cre_polyglot_r.yaml "${SFNB_ROOT}/config/${CONFIG_BASENAME}"
+elif [[ -f /tmp/sfnb-cre-assets/cre_polyglot_r.yaml ]]; then
+  cp /tmp/sfnb-cre-assets/cre_polyglot_r.yaml "${SFNB_ROOT}/config/${CONFIG_BASENAME}"
 fi
 
 STARTUP_SRC=""
@@ -238,7 +238,7 @@ echo "${CRE_IMAGE_TAG}" > /opt/sfnb/CRE_VERSION
 
 echo "==> CRE ${CRE_IMAGE_TAG} pre-bake complete"
 echo "    R ${R_VERSION} + snowflakeR + RSnowflake"
-echo "    extras: rpy2, sfnb-multilang, auto %%R startup"
+echo "    extras: rpy2, snowflake-notebook-polyglot, auto %%R startup"
 if [[ "${SFNB_CRE_ADBC}" == "1" ]]; then
   echo "    ADBC: adbcdrivermanager + adbcsnowflake (conda go + libadbc-driver-snowflake)"
 fi

@@ -1,19 +1,19 @@
-"""Snowflake Notebook Multi-Language Toolkit.
+"""Snowflake Notebook Polyglot Toolkit.
 
 Install and manage R, Scala/Java, and Julia in Snowflake Workspace Notebooks.
 
 Quick start::
 
-    from sfnb_multilang import install
+    from sfnb_polyglot import install
     install(languages=["r", "scala"])
 
 For EAI setup::
 
-    from sfnb_multilang import ensure_eai
+    from sfnb_polyglot import ensure_eai
     ensure_eai(session, config="my_config.yaml")
 
     # Or the older CREATE OR REPLACE approach:
-    from sfnb_multilang import apply_eai, generate_eai_sql
+    from sfnb_polyglot import apply_eai, generate_eai_sql
     apply_eai(session, languages=["r", "scala"])
 """
 

@@ -1,14 +1,14 @@
 # =============================================================================
 # Custom Runtime Environment (CRE) — ML demos (credit risk, registry, forecast)
 # =============================================================================
-# Baked into sfnb-multilang-r:ml-v1 via configs/sfnb_ml.example.yaml.
-# Attach in Workspace as cre@sfnb_multilang_ml for Posit / E2E ML notebooks.
+# Baked into sfnb-polyglot-r:ml-v1 via configs/sfnb_ml.example.yaml.
+# Attach in Workspace as cre@sfnb_polyglot_ml for Posit / E2E ML notebooks.
 #
-# Keeps sfnb_multilang_r (v1) lean for fast interop and Feature Store-only work.
+# Keeps sfnb_polyglot_r (v1) lean for fast interop and Feature Store-only work.
 #
 # Usage (optional context cell on ML CRE):
 #   from sfnb_setup import setup_notebook
-#   setup_notebook(config="/opt/sfnb/config/cre_multilang_ml.yaml",
+#   setup_notebook(config="/opt/sfnb/config/cre_polyglot_ml.yaml",
 #                  packages=["snowflakeR", "RSnowflake"])
 # =============================================================================
 

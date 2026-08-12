@@ -3,7 +3,7 @@
 Organizations in regulated industries (banking, insurance, healthcare,
 government) often require that all external packages pass through an
 internal artifact repository proxy before entering their network. This
-document explains how to configure `sfnb-multilang` to route every
+document explains how to configure `snowflake-notebook-polyglot` to route every
 package download through a corporate mirror.
 
 For a longer **compliance-oriented** walkthrough (mirrors plus Model
@@ -18,7 +18,7 @@ By default the toolkit downloads packages from public upstream sources:
 | Package type | Default source |
 |---|---|
 | conda (R runtime, pre-compiled R packages) | `conda.anaconda.org/conda-forge` |
-| pip (sfnb-multilang, nevergrad, ipywidgets) | `pypi.org` |
+| pip (snowflake-notebook-polyglot, nevergrad, ipywidgets) | `pypi.org` |
 | CRAN (R packages not on conda-forge) | `cloud.r-project.org` |
 | R tarballs (snowflakeR, RSnowflake) | `github.com` release assets |
 | micromamba binary | `micro.mamba.pm` / GitHub Releases |

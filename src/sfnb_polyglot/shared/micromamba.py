@@ -11,7 +11,7 @@ import tempfile
 from .download import retry
 from .subprocess_utils import run_cmd
 
-logger = logging.getLogger("sfnb_multilang.shared.micromamba")
+logger = logging.getLogger("sfnb_polyglot.shared.micromamba")
 
 MIN_ARCHIVE_BYTES = 1_000_000  # bzip2 archive should be >1 MB
 MIN_BINARY_BYTES = 3_000_000   # standalone binary should be >3 MB
@@ -148,7 +148,7 @@ def _download_custom_url(binary_path: str, url: str, ssl_cert_path: str = "") ->
     import base64
 
     parsed = urlparse(url)
-    headers = {"User-Agent": "sfnb-multilang"}
+    headers = {"User-Agent": "snowflake-notebook-polyglot"}
     if parsed.username:
         from urllib.parse import unquote
         raw_user = unquote(parsed.username)

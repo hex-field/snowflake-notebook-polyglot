@@ -14,7 +14,7 @@ from ..shared.download import retry
 from ..shared.subprocess_utils import run_cmd
 from .base import LanguagePlugin, PluginResult
 
-logger = logging.getLogger("sfnb_multilang.languages.scala")
+logger = logging.getLogger("sfnb_polyglot.languages.scala")
 
 DEFAULT_JAR_DIR = os.path.expanduser("~/scala_jars")
 

@@ -9,7 +9,7 @@ from typing import Optional
 
 from .subprocess_utils import run_cmd
 
-logger = logging.getLogger("sfnb_multilang.shared.conda_env")
+logger = logging.getLogger("sfnb_polyglot.shared.conda_env")
 
 
 def _micromamba_bin() -> str:

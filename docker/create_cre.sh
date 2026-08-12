@@ -69,7 +69,7 @@ python3 "${RENDER}" "${PROFILE}" -o "${GEN_DIR}"
 # shellcheck source=/dev/null
 source "${GEN_DIR}/cre_profile.env"
 
-RUNTIME_CFG="${SFNB_RUNTIME_CONFIG:-cre_multilang_r.yaml}"
+RUNTIME_CFG="${SFNB_RUNTIME_CONFIG:-cre_polyglot_r.yaml}"
 if [[ ! -f "${REPO_ROOT}/configs/${RUNTIME_CFG}" ]]; then
   echo "ERROR: runtime_config not found: configs/${RUNTIME_CFG}"
   exit 1

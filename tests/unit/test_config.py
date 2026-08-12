@@ -8,13 +8,13 @@ import tempfile
 import pytest
 import yaml
 
-from sfnb_multilang.config import (
+from sfnb_polyglot.config import (
     ToolkitConfig,
     apply_cli_overrides,
     config_to_dict,
     load_config,
 )
-from sfnb_multilang.exceptions import ConfigError
+from sfnb_polyglot.exceptions import ConfigError
 
 
 class TestLoadConfig:

@@ -1,4 +1,4 @@
-"""Logging setup for the multi-language toolkit.
+"""Logging setup for the polyglot toolkit.
 
 Provides configurable console + file handlers with optional JSON
 formatting for machine-parseable output.
@@ -14,7 +14,7 @@ import time
 from datetime import datetime, timezone
 from typing import Optional
 
-LOGGER_NAME = "sfnb_multilang"
+LOGGER_NAME = "sfnb_polyglot"
 
 
 class JsonFormatter(logging.Formatter):

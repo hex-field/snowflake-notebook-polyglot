@@ -1,6 +1,6 @@
 # Workspace notebook template (reference CRE v1, no bootstrap cell)
 
-Use when the notebook is attached to **`cre@sfnb_multilang_r`** (or your org CRE name) built from sfnb-multilang **v1** (`sfnb-multilang-r:v1`).
+Use when the notebook is attached to **`cre@sfnb_polyglot_r`** (or your org CRE name) built from snowflake-notebook-polyglot **v1** (`sfnb-polyglot-r:v1`).
 
 ## Snowsight setup
 
@@ -25,7 +25,7 @@ R and `%%R` are pre-baked in the container runtime. Optional Python cell sets se
 from sfnb_setup import setup_notebook
 
 setup_notebook(
-    config="/opt/sfnb/config/cre_multilang_r.yaml",  # baked in reference v1 image
+    config="/opt/sfnb/config/cre_polyglot_r.yaml",  # baked in reference v1 image
     packages=["snowflakeR", "RSnowflake"],
 )
 ```

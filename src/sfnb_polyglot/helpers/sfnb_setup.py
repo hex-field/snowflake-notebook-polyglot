@@ -1,4 +1,4 @@
-"""Bootstrap sfnb_multilang for Snowflake Workspace Notebooks.
+"""Bootstrap sfnb_polyglot for Snowflake Workspace Notebooks.
 
 Single file to set up a Workspace Notebook: session context, EAI
 validation, language runtime installation, and R package installation.
@@ -8,7 +8,7 @@ in every Snowflake Notebook before any pip install).
 
 DERIVED COPY -- Do not edit directly.
   The canonical source is:
-    snowflake-notebook-multilang/src/sfnb_multilang/helpers/sfnb_setup.py
+    snowflake-notebook-polyglot/src/sfnb_polyglot/helpers/sfnb_setup.py
   Edit there, then copy here.
 
 Usage in notebooks:
@@ -1007,7 +1007,7 @@ def ensure_eai(
 
 
 # ==========================================================================
-# Section 8: Bootstrap sfnb-multilang
+# Section 8: Bootstrap snowflake-notebook-polyglot
 # ==========================================================================
 
 def _detect_monorepo():
@@ -1025,10 +1025,10 @@ def _detect_monorepo():
 
 
 def _find_local_src():
-    """Find sfnb_multilang source tree relative to this file or cwd.
+    """Find sfnb_polyglot source tree relative to this file or cwd.
 
-    Walks up from both anchors looking for src/sfnb_multilang/__init__.py.
-    Works when sfnb_setup.py lives inside the snowflake-notebook-multilang
+    Walks up from both anchors looking for src/sfnb_polyglot/__init__.py.
+    Works when sfnb_setup.py lives inside the snowflake-notebook-polyglot
     repo (e.g. Workspace created from the public repo) without needing
     network access.
     """
@@ -1036,7 +1036,7 @@ def _find_local_src():
     for anchor in anchors:
         d = anchor
         for _ in range(10):
-            candidate = os.path.join(d, "src", "sfnb_multilang", "__init__.py")
+            candidate = os.path.join(d, "src", "sfnb_polyglot", "__init__.py")
             if os.path.isfile(candidate):
                 return os.path.join(d, "src")
             parent = os.path.dirname(d)
@@ -1082,7 +1082,7 @@ def _bootstrap():
     root = _detect_monorepo()
     if root:
         os.environ.setdefault("MONOREPO_ROOT", root)
-        src = os.path.join(root, "snowflake-notebook-multilang", "src")
+        src = os.path.join(root, "snowflake-notebook-polyglot", "src")
         if src not in sys.path:
             sys.path.insert(0, src)
         for pkg, var in [("snowflakeR", "SNOWFLAKER_PATH"),
@@ -1092,7 +1092,7 @@ def _bootstrap():
                 os.environ.setdefault(var, pkg_dir)
 
     try:
-        _found = importlib.util.find_spec("sfnb_multilang") is not None
+        _found = importlib.util.find_spec("sfnb_polyglot") is not None
     except OSError:
         _found = False
     if not _found:
@@ -1108,8 +1108,8 @@ def _bootstrap():
             _boot_pip_flags = _pip_index_flags(_boot_mirrors)
 
             _GITHUB_URL = (
-                "sfnb-multilang @ https://github.com/Snowflake-Labs/"
-                "snowflake-notebook-multilang/archive/refs/heads/main.zip"
+                "snowflake-notebook-polyglot @ https://github.com/hex-field/"
+                "snowflake-notebook-polyglot/archive/refs/heads/main.zip"
             )
             try:
                 subprocess.check_call(
@@ -1125,10 +1125,10 @@ def _bootstrap():
                 print(
                     "\n"
                     "============================================================\n"
-                    "  ERROR: Cannot install sfnb-multilang\n"
+                    "  ERROR: Cannot install snowflake-notebook-polyglot\n"
                     "============================================================\n"
                     "\n"
-                    "  The sfnb_multilang package was not found locally and\n"
+                    "  The sfnb_polyglot package was not found locally and\n"
                     "  could not be downloaded from GitHub (no network access).\n"
                     "\n"
                     "  This usually means your Workspace Notebook service does\n"
@@ -1150,7 +1150,7 @@ def _bootstrap():
                     "    4. Restart the kernel and re-run this cell\n"
                     "\n"
                     "  Alternatively, create your Workspace from the\n"
-                    "  snowflake-notebook-multilang repo so the package source\n"
+                    "  snowflake-notebook-polyglot repo so the package source\n"
                     "  is available locally (no EAI needed for bootstrap).\n"
                     "\n"
                     "============================================================\n",
@@ -1161,7 +1161,7 @@ def _bootstrap():
 
 _bootstrap()
 
-from sfnb_multilang import install  # noqa: E402
+from sfnb_polyglot import install  # noqa: E402
 
 
 # ==========================================================================
@@ -1173,7 +1173,7 @@ def install_r(**kwargs):
     kwargs.setdefault("languages", ["r"])
     install(**kwargs)
     try:
-        from sfnb_multilang.helpers.r_helpers import setup_r_environment
+        from sfnb_polyglot.helpers.r_helpers import setup_r_environment
     except ImportError:
         from r_helpers import setup_r_environment
     setup_r_environment()
@@ -1201,7 +1201,7 @@ def _resolve_tarball(
             import base64
 
             parsed = urlparse(src)
-            headers = {"User-Agent": "sfnb-multilang"}
+            headers = {"User-Agent": "snowflake-notebook-polyglot"}
             download_url = src
             if parsed.username:
                 raw_user = unquote(parsed.username)
@@ -1348,7 +1348,7 @@ def setup_notebook(
     1. Read config YAML (context + eai + languages + tarballs)
     2. Set session context (from config or session defaults)
     3. Discover/validate EAI domains; create supplementary if needed
-    4. Bootstrap sfnb-multilang (pip install if needed)
+    4. Bootstrap snowflake-notebook-polyglot (pip install if needed)
     5. Install language runtime (R/Scala/Julia) + register magics
     6. Install language packages (tarballs/pak)
     7. Print summary + write .sfnb_setup.log

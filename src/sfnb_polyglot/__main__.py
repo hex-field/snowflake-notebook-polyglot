@@ -1,4 +1,4 @@
-"""Entry point for python -m sfnb_multilang."""
+"""Entry point for python -m sfnb_polyglot."""
 
 import sys
 

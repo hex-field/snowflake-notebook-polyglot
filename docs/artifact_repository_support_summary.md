@@ -1,4 +1,4 @@
-# Artifact Repository & Conda Channel Compliance for multi-language (R) Notebooks and snowflakeR
+# Artifact Repository & Conda Channel Compliance for polyglot (R) Notebooks and snowflakeR
 
 **Date:** 2026-03-27 (updated 2026-04-15; lives in this repo under `docs/`)
 **Audience:** Snowflake accounts using Workspace notebooks with **snowflakeR**
@@ -19,7 +19,7 @@ beside your notebooks:
    commercial channels.
 
 Both are **configuration-only**: you do not edit the `snowflakeR` or
-multilang package sources; you point `setup_notebook()` at a YAML file
+polyglot package sources; you point `setup_notebook()` at a YAML file
 that carries the policy.
 
 The settings are aimed at organizations in regulated industries
@@ -639,7 +639,7 @@ the raw token.
 
 ### How `auth_secret` behaves in the notebook helper
 
-With a supported **snowflake-notebook-multilang** / `sfnb_setup.py`
+With a supported **snowflake-notebook-polyglot** / `sfnb_setup.py`
 build (for example from Snowflake-Labs releases):
 
 1. You set `mirrors.auth_secret` in YAML to a fully qualified Snowflake
@@ -949,12 +949,12 @@ Snowflake-Labs repositories; you do not need them to *use* mirrors or
 
 | File | Change |
 |---|---|
-| `sfnb_multilang/config.py` | New `MirrorsConfig` dataclass; parsed from YAML `mirrors:` section |
-| `sfnb_multilang/installer.py` | Threads mirror URLs through micromamba, conda, and pip install phases |
-| `sfnb_multilang/shared/micromamba.py` | Custom URL download with SSL context support |
-| `sfnb_multilang/shared/conda_env.py` | `--ssl-verify` flag for custom conda channels |
-| `sfnb_multilang/languages/r.py` | CRAN mirror URL for `install.packages()` and `remotes::install_version()` |
-| `sfnb_multilang/helpers/sfnb_setup.py` | Mirror-aware EAI domain derivation, pip index flags, tarball SSL |
+| `sfnb_polyglot/config.py` | New `MirrorsConfig` dataclass; parsed from YAML `mirrors:` section |
+| `sfnb_polyglot/installer.py` | Threads mirror URLs through micromamba, conda, and pip install phases |
+| `sfnb_polyglot/shared/micromamba.py` | Custom URL download with SSL context support |
+| `sfnb_polyglot/shared/conda_env.py` | `--ssl-verify` flag for custom conda channels |
+| `sfnb_polyglot/languages/r.py` | CRAN mirror URL for `install.packages()` and `remotes::install_version()` |
+| `sfnb_polyglot/helpers/sfnb_setup.py` | Mirror-aware EAI domain derivation, pip index flags, tarball SSL |
 | `docs/custom_mirrors.md` | New -- comprehensive mirror setup guide |
 | `docs/configuration.md` | Updated -- mirrors section reference + cross-links |
 | `docs/network_rules.md` | Updated -- mirror-aware EAI simplification section |
@@ -965,8 +965,8 @@ Snowflake-Labs repositories; you do not need them to *use* mirrors or
 
 | File | Change |
 |---|---|
-| `sfnb_multilang/config.py` | New `RegistryConfig` dataclass; parsed from YAML `registry:` section |
-| `sfnb_multilang/helpers/sfnb_setup.py` | New `_apply_registry_env()` exports `SFR_CONDA_CHANNEL` / `SFR_CONDA_CHANNEL_STRICT` env vars from config |
+| `sfnb_polyglot/config.py` | New `RegistryConfig` dataclass; parsed from YAML `registry:` section |
+| `sfnb_polyglot/helpers/sfnb_setup.py` | New `_apply_registry_env()` exports `SFR_CONDA_CHANNEL` / `SFR_CONDA_CHANNEL_STRICT` env vars from config |
 | `snowflakeR/inst/python/sfr_registry_bridge.py` | New `conda_channel` param on `registry_log_model()`; `_prefix_conda_channel()` helper auto-prefixes deps |
 | `snowflakeR/R/registry.R` | New `conda_channel` + `conda_channel_strict` on `sfr_model_registry()` and `sfr_log_model()`; strict mode enforcement; env var fallback |
 | `docs/configuration.md` | Updated -- `registry` section reference with compliance notes |

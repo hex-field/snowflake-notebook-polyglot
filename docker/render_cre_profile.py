@@ -40,14 +40,14 @@ def render(profile_path: Path, out_dir: Path) -> None:
     tarballs = prof.get("tarballs") or {}
     extras = prof.get("extras") or {}
 
-    name = str(cre.get("name", "sfnb_multilang_r"))
-    image = str(cre.get("image", "sfnb-multilang-r"))
+    name = str(cre.get("name", "sfnb_polyglot_r"))
+    image = str(cre.get("image", "sfnb-polyglot-r"))
     tag = str(cre.get("tag", "v1"))
     version_label = str(cre.get("version_label", tag))
     r_version = str(cre.get("r_version", "4.5.2"))
     snowbooks_tag = str(cre.get("snowbooks_tag", "2.5.0"))
     adbc = cre.get("adbc", True)
-    runtime_config = str(cre.get("runtime_config", "cre_multilang_r.yaml"))
+    runtime_config = str(cre.get("runtime_config", "cre_polyglot_r.yaml"))
     config_path = f"/opt/sfnb/config/{runtime_config}"
 
     registry = str(sf.get("registry_url", "")).strip()

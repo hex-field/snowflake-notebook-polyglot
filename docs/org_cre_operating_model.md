@@ -38,16 +38,16 @@ This matches what many enterprises do in practice: a managed setup phase (image 
 |-----------|--------|
 | Org CRE not ready | `setup_notebook()` + tarballs in YAML |
 | One-off CRAN experiment | Bootstrap or rebuild CRE with `extras.cran` |
-| Session context / EAI only on CRE | `setup_notebook(config="/opt/sfnb/config/cre_multilang_r.yaml")` — fast skip path |
+| Session context / EAI only on CRE | `setup_notebook(config="/opt/sfnb/config/cre_polyglot_r.yaml")` — fast skip path |
 | Wrong CRE attached | Fix advanced settings; restart session |
 
 ## CI/CD sketch
 
 ```yaml
 # Pseudocode — adapt to your pipeline
-- docker build --platform linux/amd64 -f docker/Dockerfile.multilang-r ...
+- docker build --platform linux/amd64 -f docker/Dockerfile.polyglot-r ...
 - snow custom-image validate $IMAGE_TAG
-- docker push $REGISTRY/$REPO/sfnb-multilang-r:$TAG
+- docker push $REGISTRY/$REPO/sfnb-polyglot-r:$TAG
 - snow sql -q "CREATE OR REPLACE CUSTOM RUNTIME ENVIRONMENT ..."
 ```
 

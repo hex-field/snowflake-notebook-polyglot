@@ -1,15 +1,69 @@
 # Changelog
 
-All notable changes to the `sfnb-multilang` toolkit are documented here.
+All notable changes to the `snowflake-notebook-polyglot` toolkit are documented here.
+
+## [0.2.0] -- unreleased
+
+Fork and rename. This release marks the project's move from Snowflake Labs to
+independent maintenance by Hex Field.
+
+Forked from
+[Snowflake-Labs/snowflake-notebook-multilang](https://github.com/Snowflake-Labs/snowflake-notebook-multilang)
+at commit `497875fdab0c73132e4908e76f02796b85e92a06` (12 June 2026). The original
+work is Copyright 2026 Snowflake Inc., licensed under Apache 2.0; that copyright
+is retained. Files have been modified from their original form as set out below.
+
+Version jumps from 0.1.3 to 0.2.0 to signal the discontinuity. The original was
+never published to PyPI, so there is no released version being superseded.
+
+### Changed -- BREAKING
+
+- **Project renamed** `snowflake-notebook-multilang` → `snowflake-notebook-polyglot`.
+- **Python package renamed** `sfnb_multilang` → `sfnb_polyglot`. All imports must
+  be updated: `from sfnb_multilang.installer import ...` becomes
+  `from sfnb_polyglot.installer import ...`.
+- **Distribution name** is now `snowflake-notebook-polyglot`
+  (`pip install snowflake-notebook-polyglot`). The distribution name and import
+  name differ deliberately: the former is descriptive for discovery, the latter
+  short for everyday use.
+- **Config files renamed** `cre_multilang_r.yaml` → `cre_polyglot_r.yaml`,
+  `cre_multilang_ml.yaml` → `cre_polyglot_ml.yaml`.
+- **Container assets renamed** `Dockerfile.multilang-r` → `Dockerfile.polyglot-r`;
+  CRE image name `sfnb-multilang-r` → `sfnb-polyglot-r`; build artefact
+  `sfnb-multilang.zip` → `sfnb-polyglot.zip`.
+- **Build argument renamed** `SFNB_MULTILANG_REF` → `SFNB_POLYGLOT_REF`.
+- Documentation and prose now say "polyglot" rather than "multi-language".
+
+### Unchanged (deliberately)
+
+- **Snowflake object names.** `MULTILANG_NOTEBOOK_EAI` (external access
+  integration) and `MULTILANG_NOTEBOOK_EGRESS` (network rule) keep their current
+  names. Renaming them would require every existing deployment to re-create
+  Snowflake objects, so it is held back as a separate decision rather than
+  bundled into this rename.
+- **`sfnb-setup` CLI command** and the `sfnb_setup.py` helper keep their names.
+
+### Migration
+
+Existing users need only update imports and the install source. No functional
+behaviour has changed in this release.
+
+```diff
+- !pip install "sfnb-multilang @ git+https://github.com/Snowflake-Labs/snowflake-notebook-multilang"
++ !pip install snowflake-notebook-polyglot
+
+- from sfnb_multilang.installer import install
++ from sfnb_polyglot.installer import install
+```
 
 ## [Unreleased]
 
 ### Added
 
 - **ML CRE profile (`sfnb_ml.example.yaml`):** second image tag `ml-v1` /
-  `cre@sfnb_multilang_ml` with tidymodels, xgboost, ranger, forecast, and
-  foreach baked in; `configs/cre_multilang_ml.yaml` runtime preset for Posit /
-  credit-risk E2E demos. Keeps lean `sfnb_multilang_r` v1 unchanged.
+  `cre@sfnb_polyglot_ml` with tidymodels, xgboost, ranger, forecast, and
+  foreach baked in; `configs/cre_polyglot_ml.yaml` runtime preset for Posit /
+  credit-risk E2E demos. Keeps lean `sfnb_polyglot_r` v1 unchanged.
 - **CRE `runtime_config`:** profile YAML selects which config file is copied
   into `/opt/sfnb/config/` at image build time.
 
@@ -19,7 +73,7 @@ All notable changes to the `sfnb-multilang` toolkit are documented here.
   downloads micromamba to `/root/micromamba` when the image bakes R at
   `/home/jupyter/micromamba`. Honors `SFNB_MICROMAMBA_ROOT`, sets
   `MAMBA_ROOT_PREFIX` on micromamba subprocesses, and documents the path in
-  `cre_multilang_r.yaml`.
+  `cre_polyglot_r.yaml`.
 - **`%%R` `-i` / `-o` comma lists:** `-o p, mtcars` (space after comma) no longer
   leaves an orphan token that rpy2 injects into the R cell (`mtcarslibrary(...)`).
   `SafeRMagics` normalizes IO lists to `-o p,mtcars` before parsing.
