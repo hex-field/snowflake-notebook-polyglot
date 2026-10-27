@@ -18,8 +18,8 @@ cre:
   image: sfnb-polyglot-r
   tag: ml-v1
   version_label: ml-v1
-  r_version: "4.5.2"
-  snowbooks_tag: "2.5.0"
+  r_version: "4.5.3"
+  snowbooks_tag: "2.9.0"
   adbc: true
   # Runtime YAML copied into the image at /opt/sfnb/config/
   runtime_config: cre_polyglot_ml.yaml

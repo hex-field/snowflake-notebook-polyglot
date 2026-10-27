@@ -32,7 +32,7 @@ if [[ ! -f "${GEN_DIR}/cre_extra_install.sh" ]]; then
 fi
 
 IMAGE_TAG="${IMAGE_TAG:-sfnb-polyglot-r:v1}"
-SNOWBOOKS_TAG="${SNOWBOOKS_TAG:-2.5.0}"
+SNOWBOOKS_TAG="${SNOWBOOKS_TAG:-2.9.0}"
 PLATFORM="${PLATFORM:-linux/amd64}"
 
 if [[ -z "${REGISTRY_URL:-}" ]]; then
