@@ -43,10 +43,27 @@ never published to PyPI, so there is no released version being superseded.
   bundled into this rename.
 - **`sfnb-setup` CLI command** and the `sfnb_setup.py` helper keep their names.
 
+### Synced from upstream
+
+Changes made in Snowflake-Labs/snowflake-notebook-multilang after the fork
+(Murray Stokely, Aug–Sep 2026, upstream PRs #1 and #2), applied to the renamed
+files:
+
+- **CRE base image path** moved from
+  `st_plat/runtime/x86/runtime_image/snowbooks` to
+  `container_runtime/cpu_x86_64`, fixing builds in customer accounts.
+  `SNOWBOOKS_TAG` bumped 2.5.0 → 2.9.0 (latest Container Runtime release).
+- **CRE R image:** R 4.5.2 → 4.5.3; snowflakeR v0.2.0 and RSnowflake v0.2.2
+  tarballs; zoo, cowplot, scales, patchwork and arrow baked in; `R_HOME` and
+  `PATH` exported so the rpy2 pip install can build against the conda R.
+- **Follow-up (Hex Field):** the same 2.9.0 / 4.5.3 defaults applied to
+  `build_cre.sh`, `render_cre_profile.py` and `sfnb_ml.example.yaml`, which
+  upstream left on the old values.
+
 ### Migration
 
-Existing users need only update imports and the install source. No functional
-behaviour has changed in this release.
+Existing users need only update imports and the install source. Apart from the
+upstream CRE changes above, no functional behaviour has changed in this release.
 
 ```diff
 - !pip install "sfnb-multilang @ git+https://github.com/Snowflake-Labs/snowflake-notebook-multilang"
