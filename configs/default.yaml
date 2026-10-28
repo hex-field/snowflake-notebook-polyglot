@@ -84,7 +84,6 @@ languages:
 # ---------------------------------------------------------------------------
 network_rule:
   apply_in_installer: true
-  account: ""
   rule_name: polyglot_notebook_egress
   integration_name: polyglot_notebook_eai
   grant_to_role: ""

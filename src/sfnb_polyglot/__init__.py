@@ -60,7 +60,6 @@ def install(
 
 def generate_eai_sql(
     config: str | None = None,
-    account: str = "",
     languages: list[str] | None = None,
     **kwargs,
 ) -> str:
@@ -79,13 +78,12 @@ def generate_eai_sql(
     if languages:
         cfg = apply_cli_overrides(cfg, languages=languages, **kwargs)
 
-    return generate_network_rule_sql(cfg, account=account)
+    return generate_network_rule_sql(cfg)
 
 
 def apply_eai(
     session,
     config: str | None = None,
-    account: str = "",
     languages: list[str] | None = None,
     **kwargs,
 ) -> str:
@@ -104,7 +102,7 @@ def apply_eai(
     if languages:
         cfg = apply_cli_overrides(cfg, languages=languages)
 
-    return _apply_eai(session, config=cfg, account=account, **kwargs)
+    return _apply_eai(session, config=cfg, **kwargs)
 
 
 def ensure_eai(
@@ -112,7 +110,6 @@ def ensure_eai(
     config: str | None = None,
     eai_name: str | None = None,
     rule_name: str | None = None,
-    account: str = "",
     languages: list[str] | None = None,
     **kwargs,
 ) -> dict:
@@ -138,6 +135,6 @@ def ensure_eai(
 
     return _ensure_eai(
         session, config=cfg, eai_name=eai_name,
-        rule_name=rule_name, account=account,
+        rule_name=rule_name,
         grant_to_role=kwargs.get("grant_to_role"),
     )

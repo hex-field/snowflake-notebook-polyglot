@@ -33,7 +33,6 @@ def _build_parser() -> argparse.ArgumentParser:
                            help="Try to apply EAI before install (default: true)")
     p_install.add_argument("--no-eai", action="store_true",
                            help="Skip EAI setup")
-    p_install.add_argument("--account", default="", help="Snowflake account for EAI")
     p_install.add_argument("--verbose", "-v", action="store_true")
     p_install.add_argument("--quiet", "-q", action="store_true",
                            help="Suppress INFO messages; show only a final summary")
@@ -49,7 +48,6 @@ def _build_parser() -> argparse.ArgumentParser:
     p_eai.add_argument("--julia", action="store_true")
     p_eai.add_argument("--all", action="store_true")
     p_eai.add_argument("--r-adbc", action="store_true")
-    p_eai.add_argument("--account", default="", help="Snowflake account")
     p_eai.add_argument("--output", "-o", default=None, help="Output file (default: stdout)")
 
     # -- validate --
@@ -101,8 +99,6 @@ def _load_and_override(args) -> ToolkitConfig:
         overrides["force"] = True
     if getattr(args, "no_eai", False):
         overrides["apply_eai"] = False
-    if getattr(args, "account", ""):
-        overrides["account"] = args.account
 
     return apply_cli_overrides(cfg, **overrides)
 
@@ -134,10 +130,10 @@ def cmd_generate_eai(args) -> int:
     cfg = _load_and_override(args)
     from .network_rules import generate_network_rule_sql, export_eai_sql
 
-    sql = generate_network_rule_sql(cfg, account=args.account)
+    sql = generate_network_rule_sql(cfg)
 
     if args.output:
-        export_eai_sql(cfg, output_path=args.output, account=args.account)
+        export_eai_sql(cfg, output_path=args.output)
         print(f"SQL written to {args.output}")
     else:
         print(sql)

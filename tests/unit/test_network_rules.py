@@ -56,11 +56,17 @@ class TestGenerateSQL:
         # Julia package server bypass: should NOT include pkg.julialang.org
         assert "pkg.julialang.org" not in sql
 
-    def test_account_host(self):
+    def test_no_account_endpoint(self):
+        # Workspace containers reach Snowflake via the internal SPCS network
+        # (SNOWFLAKE_HOST + session token), so the account's public endpoint
+        # must not be added to the egress rule.
         cfg = ToolkitConfig()
         cfg.r.enabled = True
-        sql = generate_network_rule_sql(cfg, account="myaccount")
-        assert "myaccount.snowflakecomputing.com" in sql
+        cfg.scala.enabled = True
+        cfg.julia.enabled = True
+        sql = generate_network_rule_sql(cfg)
+        assert ".snowflakecomputing.com" not in sql.replace(
+            "sfc-repo.snowflakecomputing.com", "")
 
     def test_custom_names(self):
         cfg = ToolkitConfig()

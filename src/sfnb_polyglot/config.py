@@ -115,7 +115,6 @@ class RegistryConfig:
 @dataclass
 class NetworkRuleConfig:
     apply_in_installer: bool = True
-    account: str = ""
     rule_name: str = "polyglot_notebook_egress"
     integration_name: str = "polyglot_notebook_eai"
     grant_to_role: str = ""
@@ -293,7 +292,6 @@ def _build_config(raw: dict) -> ToolkitConfig:
     nr_raw = raw.get("network_rule", {}) or {}
     cfg.network_rule = NetworkRuleConfig(
         apply_in_installer=bool(nr_raw.get("apply_in_installer", True)),
-        account=str(nr_raw.get("account", "")),
         rule_name=str(nr_raw.get("rule_name", "polyglot_notebook_egress")),
         integration_name=str(nr_raw.get("integration_name", "polyglot_notebook_eai")),
         grant_to_role=str(nr_raw.get("grant_to_role", "")),
@@ -362,7 +360,6 @@ def config_to_dict(cfg: ToolkitConfig) -> dict:
         },
         "network_rule": {
             "apply_in_installer": cfg.network_rule.apply_in_installer,
-            "account": cfg.network_rule.account,
             "rule_name": cfg.network_rule.rule_name,
             "integration_name": cfg.network_rule.integration_name,
             "grant_to_role": cfg.network_rule.grant_to_role,
@@ -387,7 +384,6 @@ def apply_cli_overrides(cfg: ToolkitConfig, **kwargs: Any) -> ToolkitConfig:
         verbose: bool -- set log level to DEBUG
         force: bool -- force reinstall
         apply_eai: bool -- try to apply EAI in installer
-        account: str -- Snowflake account for EAI
     """
     languages = kwargs.get("languages")
     if languages:
@@ -410,7 +406,5 @@ def apply_cli_overrides(cfg: ToolkitConfig, **kwargs: Any) -> ToolkitConfig:
         cfg.force_reinstall = True
     if "apply_eai" in kwargs:
         cfg.network_rule.apply_in_installer = bool(kwargs["apply_eai"])
-    if kwargs.get("account"):
-        cfg.network_rule.account = kwargs["account"]
 
     return cfg

@@ -189,6 +189,6 @@ From a `!` shell cell or terminal:
 
 ```bash
 sfnb-setup install --r --scala --verbose
-sfnb-setup generate-eai --r --scala --account myaccount
+sfnb-setup generate-eai --r --scala
 sfnb-setup validate --config config.yaml
 ```

@@ -163,7 +163,7 @@ sfnb-setup install --config config.yaml
 sfnb-setup install --r --scala --verbose
 
 # Generate EAI SQL
-sfnb-setup generate-eai --r --scala --account myaccount
+sfnb-setup generate-eai --r --scala
 
 # Validate existing installation
 sfnb-setup validate --config config.yaml

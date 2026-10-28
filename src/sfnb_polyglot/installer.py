@@ -379,16 +379,8 @@ class Installer:
         nr_config = self.config.network_rule
         session = self._get_session()
 
-        account = nr_config.account
-        if not account and session:
-            try:
-                result = session.sql("SELECT CURRENT_ACCOUNT()").collect()
-                account = result[0][0]
-            except Exception:
-                logger.warning("Could not auto-detect account from session")
-
         sql = generate_network_rule_sql(
-            self.config, account=account,
+            self.config,
             rule_name=nr_config.rule_name,
             integration_name=nr_config.integration_name,
         )

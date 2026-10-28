@@ -56,6 +56,17 @@ never published to PyPI, so there is no released version being superseded.
   with the canonical source.
 - `sfnb_polyglot.__version__` now matches the package version (0.2.0).
 
+### Removed -- BREAKING
+
+- **Account endpoint in generated EAI rules.** The network rule generator no
+  longer adds `<account>.snowflakecomputing.com`. Workspace containers reach
+  Snowflake over the internal SPCS network (`SNOWFLAKE_HOST` + session token),
+  so the public endpoint was never needed and widened egress unnecessarily.
+  The installer no longer auto-detects the account for this purpose. The
+  `--account` CLI flag, the `account` argument to `generate_eai_sql()`,
+  `apply_eai()` and `ensure_eai()`, and `network_rule.account` in YAML are
+  removed (an `account` key in existing YAML files is ignored).
+
 ### Synced from upstream
 
 Changes made in Snowflake-Labs/snowflake-notebook-multilang after the fork

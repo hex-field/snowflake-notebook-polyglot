@@ -59,11 +59,12 @@ TOOLKIT_HOSTS = [
 ]
 
 
-def _collect_required_hosts(
-    config: ToolkitConfig,
-    account: str = "",
-) -> list[dict]:
+def _collect_required_hosts(config: ToolkitConfig) -> list[dict]:
     """Collect all required hosts from shared + toolkit + enabled plugins.
+
+    The Snowflake account endpoint is deliberately not included: Workspace
+    containers reach Snowflake over the internal SPCS network via
+    SNOWFLAKE_HOST and the session token, so no egress rule is needed for it.
 
     Returns deduplicated list of host dicts sorted by category then hostname.
     """
@@ -76,16 +77,6 @@ def _collect_required_hosts(
             h.setdefault("category", plugin.name)
         all_hosts.extend(plugin_hosts)
 
-    acct = account or config.network_rule.account
-    if acct:
-        all_hosts.append({
-            "host": f"{acct}.snowflakecomputing.com",
-            "port": 443,
-            "purpose": "Snowflake account public endpoint",
-            "required": True,
-            "category": "snowflake",
-        })
-
     seen: set[str] = set()
     unique: list[dict] = []
     for h in all_hosts:
@@ -93,7 +84,7 @@ def _collect_required_hosts(
             seen.add(h["host"])
             unique.append(h)
 
-    category_order = {"shared": 0, "toolkit": 1, "snowflake": 2}
+    category_order = {"shared": 0, "toolkit": 1}
     unique.sort(key=lambda h: (
         category_order.get(h.get("category", "plugin"), 3),
         h["host"],
@@ -103,7 +94,6 @@ def _collect_required_hosts(
 
 def generate_network_rule_sql(
     config: ToolkitConfig | str,
-    account: str = "",
     rule_name: str = "polyglot_notebook_egress",
     integration_name: str = "polyglot_notebook_eai",
 ) -> str:
@@ -115,7 +105,7 @@ def generate_network_rule_sql(
     if isinstance(config, str):
         config = load_config(config)
 
-    unique_hosts = _collect_required_hosts(config, account=account)
+    unique_hosts = _collect_required_hosts(config)
     plugins = get_enabled_plugins(config)
 
     # Build SQL
@@ -127,7 +117,6 @@ def generate_network_rule_sql(
             current_category = cat
             comment = {
                 "shared": "All languages: micromamba + conda-forge",
-                "snowflake": "Snowflake account endpoint",
             }.get(cat)
             if comment:
                 host_lines.append(f"\n    -- {comment}")
@@ -173,13 +162,12 @@ CREATE OR REPLACE EXTERNAL ACCESS INTEGRATION {integration_name}
 def export_eai_sql(
     config: ToolkitConfig | str,
     output_path: str = "./eai_setup.sql",
-    account: str = "",
 ) -> str:
     """Generate EAI SQL and write to a file.
 
     Returns the absolute path to the written file.
     """
-    sql = generate_network_rule_sql(config, account=account)
+    sql = generate_network_rule_sql(config)
     abs_path = os.path.abspath(output_path)
     os.makedirs(os.path.dirname(abs_path) or ".", exist_ok=True)
     with open(abs_path, "w") as f:
@@ -191,7 +179,6 @@ def export_eai_sql(
 def apply_eai(
     session,
     config: ToolkitConfig | str | None = None,
-    account: str = "",
     rule_name: str = "polyglot_notebook_egress",
     integration_name: str = "polyglot_notebook_eai",
     grant_to_role: Optional[str] = None,
@@ -209,15 +196,8 @@ def apply_eai(
     elif config is None:
         config = ToolkitConfig()
 
-    if not account:
-        try:
-            result = session.sql("SELECT CURRENT_ACCOUNT()").collect()
-            account = result[0][0]
-        except Exception:
-            pass
-
     sql = generate_network_rule_sql(
-        config, account=account,
+        config,
         rule_name=rule_name, integration_name=integration_name,
     )
 
@@ -256,7 +236,7 @@ def apply_eai(
         error_msg = str(exc)
         logger.warning("Failed to apply EAI: %s", error_msg)
         logger.info("Writing SQL to %s for manual execution", sql_export_path)
-        export_eai_sql(config, output_path=sql_export_path, account=account)
+        export_eai_sql(config, output_path=sql_export_path)
         print(sql)
 
     return sql
@@ -528,7 +508,6 @@ def ensure_eai(
     config: ToolkitConfig | str | None = None,
     eai_name: str | None = None,
     rule_name: str | None = None,
-    account: str = "",
     grant_to_role: str | None = None,
 ) -> dict:
     """Ensure the EAI has all domains required by the configured languages.
@@ -559,14 +538,7 @@ def ensure_eai(
     resolved_eai = eai_name or config.network_rule.integration_name
     resolved_rule = rule_name or config.network_rule.rule_name
 
-    if not account:
-        try:
-            result = session.sql("SELECT CURRENT_ACCOUNT()").collect()
-            account = result[0][0]
-        except Exception:
-            pass
-
-    required_hosts = _collect_required_hosts(config, account=account)
+    required_hosts = _collect_required_hosts(config)
     required_domains = {h["host"].lower() for h in required_hosts}
 
     role = grant_to_role
@@ -690,7 +662,7 @@ def ensure_eai(
 
     # ----- EAI does not exist or ALTER failed: try CREATE -----
     create_sql = generate_network_rule_sql(
-        config, account=account,
+        config,
         rule_name=resolved_rule, integration_name=resolved_eai,
     )
     if role:

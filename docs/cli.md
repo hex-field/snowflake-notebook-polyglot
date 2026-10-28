@@ -51,7 +51,6 @@ sfnb-setup install [flags]
 | `--r-duckdb` | Enable the R DuckDB Snowflake extension addon |
 | `--apply-eai` | Try to create/update the EAI before installing (default: true) |
 | `--no-eai` | Skip EAI setup entirely |
-| `--account` | Snowflake account identifier for EAI creation |
 | `--verbose`, `-v` | Set log level to DEBUG |
 | `--quiet`, `-q` | Suppress INFO messages; show only a final summary line |
 | `--force` | Force reinstall even if packages are already present |
@@ -86,7 +85,6 @@ sfnb-setup generate-eai [flags]
 | `--julia` | Include Julia domains |
 | `--all` | Include all language domains |
 | `--r-adbc` | Include ADBC addon domains |
-| `--account` | Snowflake account identifier (included in SQL comments) |
 | `--output`, `-o` | Write SQL to a file instead of stdout |
 
 When `mirrors` are configured in the YAML config, the generated SQL
@@ -169,7 +167,7 @@ Dry run -- would install:
 ### Generate EAI SQL for an administrator
 
 ```bash
-sfnb-setup generate-eai --r --r-adbc --account MYORG-MYACCOUNT -o eai_setup.sql
+sfnb-setup generate-eai --r --r-adbc -o eai_setup.sql
 ```
 
 Hand `eai_setup.sql` to your Snowflake admin. They run it with

@@ -158,7 +158,6 @@ practice you'd typically set both to conda-forge.
 | Key | Default | Description |
 |---|---|---|
 | `apply_in_installer` | `true` | Try to apply EAI in Phase 0 |
-| `account` | `""` | Snowflake account (auto-detected if empty) |
 | `rule_name` | `polyglot_notebook_egress` | Network rule name |
 | `integration_name` | `polyglot_notebook_eai` | EAI name |
 | `grant_to_role` | `""` | Role to `GRANT USAGE ON INTEGRATION` to (allows that role to attach the EAI to notebooks) |
@@ -190,4 +189,3 @@ CLI flags override YAML values:
 | `--verbose` | `logging.level: DEBUG` |
 | `--force` | `force_reinstall: true` |
 | `--no-eai` | `network_rule.apply_in_installer: false` |
-| `--account X` | `network_rule.account: X` |

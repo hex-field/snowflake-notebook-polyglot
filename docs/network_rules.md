@@ -97,18 +97,25 @@ Share the `.sql` file with your administrator. They can run it with
 ```python
 from sfnb_polyglot import generate_eai_sql
 
-sql = generate_eai_sql(languages=["r", "scala"], account="myaccount")
+sql = generate_eai_sql(languages=["r", "scala"])
 print(sql)
 ```
 
 Or from the CLI:
 
 ```bash
-sfnb-setup generate-eai --r --scala --account myaccount
+sfnb-setup generate-eai --r --scala
 sfnb-setup generate-eai --config config.yaml --output eai_setup.sql
 ```
 
 ## Required Hosts
+
+These are **outbound** hosts for downloads during setup. Your Snowflake
+account's own endpoint is not needed: Workspace containers connect to
+Snowflake over the internal SPCS network using `SNOWFLAKE_HOST` and the
+container's session token. (The only exception is if you deliberately test
+public-endpoint authentication, e.g. the key-pair diagnostics in
+`r_helpers.py`; add `<account>.snowflakecomputing.com` yourself in that case.)
 
 ### Shared (all languages)
 
