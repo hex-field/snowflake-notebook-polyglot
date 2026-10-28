@@ -2,7 +2,7 @@
 
 All notable changes to the `snowflake-notebook-polyglot` toolkit are documented here.
 
-## [0.2.0] -- unreleased
+## [0.2.0] -- 2026-10-28
 
 Fork and rename. This release marks the project's move from Snowflake Labs to
 independent maintenance by Hex Field.
@@ -22,8 +22,7 @@ never published to PyPI, so there is no released version being superseded.
 - **Python package renamed** `sfnb_multilang` → `sfnb_polyglot`. All imports must
   be updated: `from sfnb_multilang.installer import ...` becomes
   `from sfnb_polyglot.installer import ...`.
-- **Distribution name** is now `snowflake-notebook-polyglot`
-  (`pip install snowflake-notebook-polyglot`). The distribution name and import
+- **Distribution name** is now `snowflake-notebook-polyglot`. The distribution name and import
   name differ deliberately: the former is descriptive for discovery, the latter
   short for everyday use.
 - **Config files renamed** `cre_multilang_r.yaml` → `cre_polyglot_r.yaml`,
@@ -42,6 +41,20 @@ never published to PyPI, so there is no released version being superseded.
   Snowflake objects, so it is held back as a separate decision rather than
   bundled into this rename.
 - **`sfnb-setup` CLI command** and the `sfnb_setup.py` helper keep their names.
+
+### Install source
+
+- **Pinned to release tags.** The `sfnb_setup.py` bootstrap now installs the
+  toolkit from the `v0.2.0` release tag on GitHub instead of the tip of
+  `main`, so every notebook gets the same code. Set `SFNB_POLYGLOT_REF` to
+  override (e.g. `main` for development). The CRE image build uses the same
+  variable and default, and now accepts tags as well as branch names.
+- **Not on PyPI.** Installation docs (README, quickstart, CLI) now give the
+  pinned GitHub URL rather than `pip install snowflake-notebook-polyglot`,
+  which pointed at a PyPI project that doesn't exist.
+- Derived `sfnb_setup.py` copies in `notebooks/` and `examples/` re-synced
+  with the canonical source.
+- `sfnb_polyglot.__version__` now matches the package version (0.2.0).
 
 ### Synced from upstream
 
@@ -67,7 +80,7 @@ upstream CRE changes above, no functional behaviour has changed in this release.
 
 ```diff
 - !pip install "sfnb-multilang @ git+https://github.com/Snowflake-Labs/snowflake-notebook-multilang"
-+ !pip install snowflake-notebook-polyglot
++ !pip install "snowflake-notebook-polyglot @ https://github.com/hex-field/snowflake-notebook-polyglot/archive/v0.2.0.zip"
 
 - from sfnb_multilang.installer import install
 + from sfnb_polyglot.installer import install

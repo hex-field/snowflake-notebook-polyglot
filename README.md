@@ -55,8 +55,8 @@ on first run and orchestrates the full setup.
 **Alternative** -- use the `snowflake-notebook-polyglot` API directly:
 
 ```python
-# Cell 1: Install the toolkit
-!pip install snowflake-notebook-polyglot
+# Cell 1: Install the toolkit (pinned release from GitHub)
+!pip install "snowflake-notebook-polyglot @ https://github.com/hex-field/snowflake-notebook-polyglot/archive/v0.2.0.zip"
 
 # Cell 2: Install R and Scala
 from sfnb_polyglot import install
@@ -99,8 +99,10 @@ car_df.sort(col("efficiency").desc).show()
 
 ## Installation
 
+The toolkit is not published on PyPI. Install a tagged release from GitHub:
+
 ```bash
-pip install snowflake-notebook-polyglot
+pip install "snowflake-notebook-polyglot @ https://github.com/hex-field/snowflake-notebook-polyglot/archive/v0.2.0.zip"
 ```
 
 ## Usage

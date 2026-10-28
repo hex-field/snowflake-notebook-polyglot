@@ -24,7 +24,7 @@ first. In a Workspace Notebook, this happens automatically when you
 use `setup_notebook()`. For standalone CLI use:
 
 ```bash
-pip install snowflake-notebook-polyglot
+pip install "snowflake-notebook-polyglot @ https://github.com/hex-field/snowflake-notebook-polyglot/archive/v0.2.0.zip"
 sfnb-setup --help
 ```
 
@@ -213,7 +213,7 @@ sfnb-setup migrate-config \
 
 ```dockerfile
 FROM snowflake-notebook-base:latest
-RUN pip install snowflake-notebook-polyglot
+RUN pip install "snowflake-notebook-polyglot @ https://github.com/hex-field/snowflake-notebook-polyglot/archive/v0.2.0.zip"
 COPY config.yaml .
 RUN sfnb-setup install --config config.yaml --no-eai --quiet
 ```

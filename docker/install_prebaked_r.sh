@@ -185,14 +185,11 @@ if [[ -n "${NOTEBOOK_PY}" ]]; then
     "${NOTEBOOK_PY}" -m pip install -q --break-system-packages /tmp/sfnb-pkg \
       || echo "WARN: pip install local sfnb-pkg failed"
   else
-    SFNB_REF="${SFNB_POLYGLOT_REF:-main}"
-    curl -fSL -o /tmp/sfnb-polyglot.zip \
-      "https://github.com/hex-field/snowflake-notebook-polyglot/archive/refs/heads/${SFNB_REF}.zip"
-    unzip -q -o /tmp/sfnb-polyglot.zip -d /tmp
+    # Release tag by default; branch names (e.g. main) also work.
+    SFNB_REF="${SFNB_POLYGLOT_REF:-v0.2.0}"
     "${NOTEBOOK_PY}" -m pip install -q --break-system-packages \
-      "/tmp/snowflake-notebook-polyglot-${SFNB_REF}" \
+      "https://github.com/hex-field/snowflake-notebook-polyglot/archive/${SFNB_REF}.zip" \
       || echo "WARN: pip install snowflake-notebook-polyglot from GitHub failed"
-    rm -rf /tmp/sfnb-polyglot.zip "/tmp/snowflake-notebook-polyglot-${SFNB_REF}"
   fi
 else
   echo "WARN: notebook Python not found — skip rpy2/snowflake-notebook-polyglot pip install"

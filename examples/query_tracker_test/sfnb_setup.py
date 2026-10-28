@@ -1010,6 +1010,11 @@ def ensure_eai(
 # Section 8: Bootstrap snowflake-notebook-polyglot
 # ==========================================================================
 
+# Toolkit release the bootstrap installs from GitHub. Pinned to a release tag
+# so every notebook gets the same code; set SFNB_POLYGLOT_REF to override
+# (e.g. "main" for the development branch).
+TOOLKIT_REF = "v0.2.0"
+
 def _detect_monorepo():
     if os.environ.get("SFNB_PUBLIC_MODE"):
         return None
@@ -1107,9 +1112,10 @@ def _bootstrap():
             _boot_mirrors = _apply_mirror_auth(_get_mirrors(_boot_cfg))
             _boot_pip_flags = _pip_index_flags(_boot_mirrors)
 
+            _ref = os.environ.get("SFNB_POLYGLOT_REF", TOOLKIT_REF)
             _GITHUB_URL = (
                 "snowflake-notebook-polyglot @ https://github.com/hex-field/"
-                "snowflake-notebook-polyglot/archive/refs/heads/main.zip"
+                f"snowflake-notebook-polyglot/archive/{_ref}.zip"
             )
             try:
                 subprocess.check_call(

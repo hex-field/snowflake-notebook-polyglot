@@ -26,7 +26,7 @@ and session context in a single call. See the
 In a notebook cell:
 
 ```python
-!pip install snowflake-notebook-polyglot
+!pip install "snowflake-notebook-polyglot @ https://github.com/hex-field/snowflake-notebook-polyglot/archive/v0.2.0.zip"
 ```
 
 ### Step 2: Configure Network Access
